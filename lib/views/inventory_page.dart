@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_course_fp/views/sidebar.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class InventoryPage extends StatefulWidget {
+  const InventoryPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<InventoryPage> createState() => _InventoryPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _InventoryPageState extends State<InventoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const Sidebar(currentRoute: '/'),
+      drawer: const Sidebar(currentRoute: '/inventory'),
 
       appBar: AppBar(
         backgroundColor: const Color(0xFF356B52),
@@ -54,10 +54,13 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
 
-      body: const SafeArea(
-        child: Center(
-          child: Text("Dashboard Content"),
-        ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Inventory")
+          ],
+        )
       ),
     );
   }
