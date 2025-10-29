@@ -1,39 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_course_fp/views/sidebar.dart';
+import 'package:mobile_course_fp/components/sidebar.dart';
 
-class SuppliersPage extends StatefulWidget {
-  const SuppliersPage({super.key});
+class UserManagementPage extends StatefulWidget {
+  const UserManagementPage({super.key});
 
   @override
-  State<SuppliersPage> createState() => _SuppliersPageState();
+  State<UserManagementPage> createState() => _UserManagementPageState();
 }
 
-class _SuppliersPageState extends State<SuppliersPage> {
-  final List<Map<String, String>> suppliers = [
+class _UserManagementPageState extends State<UserManagementPage> {
+  final List<Map<String, String>> users = [
     {
-      "name": "MediSupply Co.",
-      "contact": "David Lee",
-      "email": "david@medisupply.com",
+      "name": "John Smith",
+      "email": "john@pharmaease.com",
+      "role": "Admin",
+      "status": "Active",
+      "lastLogin": "2025-10-20 09:30",
     },
     {
-      "name": "PharmaCorp Ltd.",
-      "contact": "Lisa Chen",
-      "email": "lisa@pharmacorp.com",
+      "name": "Sarah Johnson",
+      "email": "sarah@pharmaease.com",
+      "role": "Staff",
+      "status": "Active",
+      "lastLogin": "2025-10-19 14:15",
     },
     {
-      "name": "HealthDist Inc.",
-      "contact": "James Wilson",
-      "email": "james@healthdist.com",
+      "name": "Michael Brown",
+      "email": "michael@pharmaease.com",
+      "role": "Manager",
+      "status": "Inactive",
+      "lastLogin": "2025-09-28 16:45",
     },
     {
-      "name": "Global Pharma",
-      "contact": "Anna Martinez",
-      "email": "anna@globalpharma.com",
+      "name": "Emily Davis",
+      "email": "emily@pharmaease.com",
+      "role": "Staff",
+      "status": "Active",
+      "lastLogin": "2025-10-18 10:20",
     },
     {
-      "name": "MedSource Direct",
-      "contact": "Tom Harris",
-      "email": "tom@medsource.com",
+      "name": "Daniel Wilson",
+      "email": "daniel@pharmaease.com",
+      "role": "Admin",
+      "status": "Active",
+      "lastLogin": "2025-10-21 08:55",
     },
   ];
 
@@ -42,7 +52,7 @@ class _SuppliersPageState extends State<SuppliersPage> {
     const Color mainGreen = Color(0xFF356B52);
 
     return Scaffold(
-      drawer: const Sidebar(currentRoute: '/supplier'),
+      drawer: const Sidebar(currentRoute: '/users'),
       appBar: AppBar(
         backgroundColor: mainGreen,
         automaticallyImplyLeading: false,
@@ -83,15 +93,15 @@ class _SuppliersPageState extends State<SuppliersPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Suppliers",
+              const Text(
+                "User Management",
                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 27),
               ),
-              Text(
+              const Text(
                 "Manage your pharmacy operations efficiently",
                 style: TextStyle(color: Color.fromARGB(255, 129, 129, 129)),
               ),
-              SizedBox(height: 25),
+              const SizedBox(height: 25),
 
               Card(
                 color: Colors.white,
@@ -104,29 +114,29 @@ class _SuppliersPageState extends State<SuppliersPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                    Text(
-                        "Supplier Management",
+                      const Text(
+                        "User Management",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       Column(
                         spacing: 10,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextField(
                             decoration: InputDecoration(
-                              hintText: "Search suppliers...",
-                              prefixIcon: Icon(Icons.search),
+                              hintText: "Search users...",
+                              prefixIcon: const Icon(Icons.search),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
+                                borderSide: const BorderSide(
                                   color: Colors.grey,
                                 ),
                               ),
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                 vertical: 0,
                                 horizontal: 12,
                               ),
@@ -135,13 +145,13 @@ class _SuppliersPageState extends State<SuppliersPage> {
                           const SizedBox(width: 10),
                           ElevatedButton.icon(
                             onPressed: () {},
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.add,
                               color: Colors.white,
                               size: 18,
                             ),
-                            label: Text(
-                              "Add New Supplier",
+                            label: const Text(
+                              "Add New User",
                               style: TextStyle(color: Colors.white),
                             ),
                             style: ElevatedButton.styleFrom(
@@ -158,23 +168,45 @@ class _SuppliersPageState extends State<SuppliersPage> {
                         ],
                       ),
 
-                     SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                     // table
+                      // table
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: DataTable(
                           columns: const [
-                            DataColumn(label: Text("Supplier Name")),
-                            DataColumn(label: Text("Contact Person")),
+                            DataColumn(label: Text("Name")),
                             DataColumn(label: Text("Email")),
+                            DataColumn(label: Text("Role")),
+                            DataColumn(label: Text("Status")),
+                            DataColumn(label: Text("Last Login")),
+                            DataColumn(label: Text("Actions")),
                           ],
-                          rows: suppliers.map((s) {
+                          rows: users.map((u) {
                             return DataRow(
                               cells: [
-                                DataCell(Text(s["name"]!)),
-                                DataCell(Text(s["contact"]!)),
-                                DataCell(Text(s["email"]!)),
+                                DataCell(Text(u["name"]!)),
+                                DataCell(Text(u["email"]!)),
+                                DataCell(Text(u["role"]!)),
+                                DataCell(Text(u["status"]!)),
+                                DataCell(Text(u["lastLogin"]!)),
+                                DataCell(
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit, size: 18),
+                                        onPressed: () {},
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          size: 18,
+                                        ),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             );
                           }).toList(),
@@ -192,25 +224,3 @@ class _SuppliersPageState extends State<SuppliersPage> {
     );
   }
 }
-
-
-// Search bar
-// Container(
-//             width: 200,
-//             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-//             decoration: BoxDecoration(
-//               color: const Color.fromARGB(255, 247, 247, 247),
-//               borderRadius: BorderRadius.circular(8),
-//               border: Border.all(color: Colors.grey[400]!),
-//             ),
-//             child: Row(
-//               children: const [
-//                 Icon(Icons.search, color: Colors.grey),
-//                 SizedBox(width: 8),
-//                 Text(
-//                   "Search...",
-//                   style: TextStyle(color: Colors.grey, fontSize: 16),
-//                 ),
-//               ],
-//             ),
-//           ),

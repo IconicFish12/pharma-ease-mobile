@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_course_fp/views/sidebar.dart';
+import 'package:mobile_course_fp/components/sidebar.dart';
 
 class InventoryPage extends StatefulWidget {
   const InventoryPage({super.key});
