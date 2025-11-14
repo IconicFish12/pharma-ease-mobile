@@ -180,7 +180,7 @@ class _ActivityLogState extends State<ActivityLog> {
           padding: const EdgeInsets.all(20),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text(
-              "Audit Log",
+              "Activity Log",
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
@@ -204,7 +204,7 @@ class _ActivityLogState extends State<ActivityLog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("System Audit Log",
+                        Text("System Activity Log",
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -239,7 +239,7 @@ class _ActivityLogState extends State<ActivityLog> {
                     ElevatedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.download),
-                      label: const Text("Export Audit Log"),
+                      label: const Text("Export Activity Log"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF356B52),
                         foregroundColor: Colors.white,
