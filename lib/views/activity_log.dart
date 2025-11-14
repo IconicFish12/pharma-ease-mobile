@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/config.dart';
 
 class ActivityLog extends StatefulWidget {
   const ActivityLog({super.key});
@@ -139,39 +140,35 @@ class _ActivityLogState extends State<ActivityLog> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF356B52),
         automaticallyImplyLeading: false,
-        titleSpacing: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: Row(
-            children: [
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back, color: Colors.white70,),
-              ),
-              const Text(
-                "Pharma Ease",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.arrow_back),
+            ),
+            Icon(Icons.bar_chart_rounded, color: Config.primaryGreen),
+            SizedBox(width: 8),
+            Text('Pharma Ease'),
+          ],
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/profile'),
-              child: const CircleAvatar(
-                backgroundColor: Colors.lightBlue,
-                child: Text("H", style: TextStyle(color: Colors.white)),
+            padding: const EdgeInsets.only(right: 16.0),
+            child: CircleAvatar(
+              backgroundColor: Config.accentBlue,
+              child: Text(
+                'H',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 8),
         ],
       ),
       body: SafeArea(
