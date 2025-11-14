@@ -142,14 +142,22 @@ class _ActivityLogState extends State<ActivityLog> {
         backgroundColor: const Color(0xFF356B52),
         automaticallyImplyLeading: false,
         titleSpacing: 0,
-        title: const Padding(
-          padding: EdgeInsets.only(left: 16),
-          child: Text(
-            "Pharma Ease",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
+        title: Padding(
+          padding: const EdgeInsets.only(left: 10),
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back, color: Colors.white70,),
+              ),
+              const Text(
+                "Pharma Ease",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
         actions: [
@@ -159,17 +167,8 @@ class _ActivityLogState extends State<ActivityLog> {
               onTap: () => Navigator.pushNamed(context, '/profile'),
               child: const CircleAvatar(
                 backgroundColor: Colors.lightBlue,
-                child: Text(
-                  "RA",
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: Text("H", style: TextStyle(color: Colors.white)),
               ),
-            ),
-          ),
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
-              onPressed: () => Scaffold.of(context).openDrawer(),
             ),
           ),
           const SizedBox(width: 8),
@@ -178,154 +177,206 @@ class _ActivityLogState extends State<ActivityLog> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text(
-              "Activity Log",
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 6),
-            const Text("Manage your pharmacy operations efficiently",
-                style: TextStyle(color: Colors.grey)),
-            const SizedBox(height: 20),
-
-            // info box
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE9F6EE),
-                borderRadius: BorderRadius.circular(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Activity Log",
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
-              child: const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.shield_outlined, color: Color(0xFF356B52)),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("System Activity Log",
+              const SizedBox(height: 6),
+              const Text(
+                "Manage your pharmacy operations efficiently",
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 20),
+
+              // info box
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE9F6EE),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.shield_outlined, color: Color(0xFF356B52)),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "System Activity Log",
                             style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF356B52))),
-                        SizedBox(height: 4),
-                        Text("Secure tracking of all employee activities and system changes",
-                            style: TextStyle(color: Colors.grey)),
-                      ],
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF356B52),
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Secure tracking of all employee activities and system changes",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // activity container
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
+              // activity container
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
-                    BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 1))
-                  ]),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                // header + export
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Activity Log",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.download),
-                      label: const Text("Export Activity Log"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF356B52),
-                        foregroundColor: Colors.white,
-                      ),
-                    )
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 16),
-
-                // search
-                TextField(
-                  onChanged: (v) => setState(() => searchText = v),
-                  decoration: InputDecoration(
-                    hintText: "Search activities...",
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: const Color(0xFFF4F4F4),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // filters
-                const Text("Filter by Action", style: TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 6),
-                DropdownButtonFormField<String>(
-                  value: selectedAction,
-                  items: actions.map((a) => DropdownMenuItem(value: a, child: Text(a))).toList(),
-                  onChanged: (v) => setState(() => selectedAction = v!),
-                  decoration: _dropdownDecoration(),
-                ),
-                const SizedBox(height: 16),
-
-                const Text("Filter by Module", style: TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 6),
-                DropdownButtonFormField<String>(
-                  value: selectedModule,
-                  items: modules.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
-                  onChanged: (v) => setState(() => selectedModule = v!),
-                  decoration: _dropdownDecoration(),
-                ),
-
-                const SizedBox(height: 20),
-
-                // table (horizontal scroll)
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    // minimal styling
-                    headingRowColor: MaterialStateProperty.resolveWith((states) => const Color(0xFFF4F4F4)),
-                    columns: const [
-                      DataColumn(label: Text("Timestamp")),
-                      DataColumn(label: Text("User")),
-                      DataColumn(label: Text("Role")),
-                      DataColumn(label: Text("Action")),
-                      DataColumn(label: Text("Module")),
-                      DataColumn(label: Text("Details")),
-                      DataColumn(label: Text("IP Address")),
-                    ],
-                    rows: filteredLogs.map((r) {
-                      final action = r['action']!;
-                      final color = actionColors[action] ?? Colors.grey;
-                      return DataRow(cells: [
-                        DataCell(Text(r['timestamp']!)),
-                        DataCell(Text(r['user']!)),
-                        DataCell(Text(r['role']!)),
-                        DataCell(
-                          Chip(
-                            label: Text(action, style: TextStyle(color: color)),
-                            backgroundColor: color.withOpacity(0.12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // header + export
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Activity Log",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        DataCell(Text(r['module']!)),
-                        DataCell(SizedBox(width: 300, child: Text(r['details']!, overflow: TextOverflow.ellipsis))),
-                        DataCell(Text(r['ip']!)),
-                      ]);
-                    }).toList(),
-                  ),
+                        ElevatedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.download),
+                          label: const Text("Export Activity Log"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF356B52),
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // search
+                    TextField(
+                      onChanged: (v) => setState(() => searchText = v),
+                      decoration: InputDecoration(
+                        hintText: "Search activities...",
+                        prefixIcon: const Icon(Icons.search),
+                        filled: true,
+                        fillColor: const Color(0xFFF4F4F4),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // filters
+                    const Text(
+                      "Filter by Action",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      value: selectedAction,
+                      items: actions
+                          .map(
+                            (a) => DropdownMenuItem(value: a, child: Text(a)),
+                          )
+                          .toList(),
+                      onChanged: (v) => setState(() => selectedAction = v!),
+                      decoration: _dropdownDecoration(),
+                    ),
+                    const SizedBox(height: 16),
+
+                    const Text(
+                      "Filter by Module",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      value: selectedModule,
+                      items: modules
+                          .map(
+                            (m) => DropdownMenuItem(value: m, child: Text(m)),
+                          )
+                          .toList(),
+                      onChanged: (v) => setState(() => selectedModule = v!),
+                      decoration: _dropdownDecoration(),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // table (horizontal scroll)
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        // minimal styling
+                        headingRowColor: MaterialStateProperty.resolveWith(
+                          (states) => const Color(0xFFF4F4F4),
+                        ),
+                        columns: const [
+                          DataColumn(label: Text("Timestamp")),
+                          DataColumn(label: Text("User")),
+                          DataColumn(label: Text("Role")),
+                          DataColumn(label: Text("Action")),
+                          DataColumn(label: Text("Module")),
+                          DataColumn(label: Text("Details")),
+                          DataColumn(label: Text("IP Address")),
+                        ],
+                        rows: filteredLogs.map((r) {
+                          final action = r['action']!;
+                          final color = actionColors[action] ?? Colors.grey;
+                          return DataRow(
+                            cells: [
+                              DataCell(Text(r['timestamp']!)),
+                              DataCell(Text(r['user']!)),
+                              DataCell(Text(r['role']!)),
+                              DataCell(
+                                Chip(
+                                  label: Text(
+                                    action,
+                                    style: TextStyle(color: color),
+                                  ),
+                                  backgroundColor: color.withOpacity(0.12),
+                                ),
+                              ),
+                              DataCell(Text(r['module']!)),
+                              DataCell(
+                                SizedBox(
+                                  width: 300,
+                                  child: Text(
+                                    r['details']!,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              DataCell(Text(r['ip']!)),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
                 ),
-              ]),
-            ),
-          ]),
+              ),
+            ],
+          ),
         ),
       ),
     );
