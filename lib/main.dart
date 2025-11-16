@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {    
     final Config config = Config();
-    final _router = GoRouter(
+    final router = GoRouter(
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
@@ -106,7 +106,7 @@ class MyApp extends StatelessWidget {
       title: 'PharmaEase',
       debugShowCheckedModeBanner: false,
       theme: config.getAppTheme(),
-      routerConfig: _router,
+      routerConfig: router,
       restorationScopeId: 'app',
     );
   }

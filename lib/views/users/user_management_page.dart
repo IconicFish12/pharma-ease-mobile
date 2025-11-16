@@ -449,7 +449,7 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                   ),
                   SizedBox(height: 16),
                   DropdownButtonFormField<UserRole>(
-                    value: _role,
+                    initialValue: _role,
                     decoration: const InputDecoration(labelText: 'Role'),
                     items: UserRole.values
                         .map(
@@ -510,7 +510,7 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                     ),
                   if (widget.isEditMode)
                     DropdownButtonFormField<UserStatus>(
-                      value: _status,
+                      initialValue: _status,
                       decoration: const InputDecoration(labelText: 'Status'),
                       items: UserStatus.values
                           .map(

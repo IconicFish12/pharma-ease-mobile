@@ -137,7 +137,9 @@ class _MedicineListState extends State<MedicineList> {
   @override
   void initState() {
     super.initState();
-    _medicines.forEach((med) => med.updateStatus());
+    for (var med in _medicines) {
+      med.updateStatus();
+    }
   }
 
   void _addMedicine(Medicine newMedicine) {
@@ -455,14 +457,13 @@ class CategoryIconCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return InkWell(
       onTap: () {
-        // TODO: Filter medicine list by this category
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Filtered by ${category.name}')));
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 80, // Lebar tetap untuk kartu ikon
+        width: 80, 
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Config.primaryGreen.withOpacity(0.05),
@@ -677,7 +678,7 @@ class _AddEditMedicineModalState extends State<AddEditMedicineModal> {
                   ),
                   SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: _medicineCategory,
+                    initialValue: _medicineCategory,
                     decoration: const InputDecoration(
                       labelText: 'Medicine Category',
                     ),
@@ -728,7 +729,7 @@ class _AddEditMedicineModalState extends State<AddEditMedicineModal> {
                       SizedBox(width: 16),
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: _unit,
+                          initialValue: _unit,
                           decoration: const InputDecoration(labelText: 'Unit'),
                           items: _units
                               .map(
