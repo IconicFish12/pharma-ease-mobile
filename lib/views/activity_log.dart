@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/config.dart';
+import 'activityHelper.dart';
 
 class ActivityLog extends StatefulWidget {
   const ActivityLog({super.key});
@@ -253,14 +254,31 @@ class _ActivityLogState extends State<ActivityLog> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        ElevatedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.download),
-                          label: const Text("Export Activity Log"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF356B52),
-                            foregroundColor: Colors.white,
-                          ),
+                        Column(
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                try {
+                                  await exportCSVwithSAF(logs, "activity_log");
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("CSV berhasil disimpan"),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("Gagal export: $e")),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.download),
+                              label: const Text("Export Activity Log"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF356B52),
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
