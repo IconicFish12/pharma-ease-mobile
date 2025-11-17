@@ -290,7 +290,7 @@ class _ActivityLogState extends State<ActivityLog> {
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      value: selectedAction,
+                      initialValue: selectedAction,
                       items: actions
                           .map(
                             (a) => DropdownMenuItem(value: a, child: Text(a)),
@@ -307,7 +307,7 @@ class _ActivityLogState extends State<ActivityLog> {
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      value: selectedModule,
+                      initialValue: selectedModule,
                       items: modules
                           .map(
                             (m) => DropdownMenuItem(value: m, child: Text(m)),
@@ -324,7 +324,7 @@ class _ActivityLogState extends State<ActivityLog> {
                       scrollDirection: Axis.horizontal,
                       child: DataTable(
                         // minimal styling
-                        headingRowColor: MaterialStateProperty.resolveWith(
+                        headingRowColor: WidgetStateProperty.resolveWith(
                           (states) => const Color(0xFFF4F4F4),
                         ),
                         columns: const [
