@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_course_fp/config/config.dart';
 import 'package:mobile_course_fp/views/activity_log.dart';
 import 'package:mobile_course_fp/views/cashier/cashier_menu.dart';
+import 'package:mobile_course_fp/views/cashier/cashier_model.dart';
+import 'package:mobile_course_fp/views/cashier/receipt.dart';
+import 'package:mobile_course_fp/views/cashier/transaction_detail.dart';
 import 'package:mobile_course_fp/views/cashier/transaction_summary.dart';
 import 'package:mobile_course_fp/views/home.dart';
 import 'package:mobile_course_fp/views/medicine/medicine_list.dart';
@@ -17,7 +21,9 @@ import 'package:mobile_course_fp/views/users/profile_page.dart';
 import 'package:mobile_course_fp/views/users/user_management_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  initializeDateFormatting('id_ID', '').then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -25,7 +31,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {    
-    final Config config = Config();
+     final Config config = Config();
     final router = GoRouter(
       restorationScopeId: 'router',
       routerNeglect: true,
@@ -48,7 +54,7 @@ class MyApp extends StatelessWidget {
           routes: [
             GoRoute(
               name: 'SuppliersOrder',
-              path: '/medicine-order',
+              path: 'medicine-order',
               builder: (context, state) => const MedicineSuppliesOrder(),
             ),
           ],
@@ -60,7 +66,7 @@ class MyApp extends StatelessWidget {
           routes: [
             GoRoute(
               name: 'UserProfile',
-              path: '/profile',
+              path: 'profile',
               builder: (context, state) => const ProfilePage(),
             ),
           ],
@@ -81,9 +87,25 @@ class MyApp extends StatelessWidget {
           builder: (context, state) => const CashierMenu(),
           routes: [
             GoRoute(
-              name: 'Transaction-summary',
-              path: '/transaction-summary',
+              name: 'TransactionSummary',
+              path: 'transaction-summary',
               builder: (context, state) => const TransactionSummary(),
+            ),
+            GoRoute(
+              name: 'TransactionDetail',
+              path: 'detail',
+              builder: (context, state) {
+                final cartItems = state.extra as List<CartItem>?;
+                return TransactionDetailPage(cartItems: cartItems ?? []);
+              },
+            ),
+            GoRoute(
+              name: 'Receipt',
+              path: 'receipt', 
+              builder: (context, state) {
+                final transaction = state.extra as Transaction;
+                return ReceiptPage(transaction: transaction);
+              },
             ),
           ],
         ),
@@ -93,13 +115,13 @@ class MyApp extends StatelessWidget {
           builder: (context, state) => const Reports(),
           routes: [
             GoRoute(
-              name: 'Financial-report',
-              path: '/financial-report',
+              name: 'FinancialReport',
+              path: 'financial-report',
               builder: (context, state) => const FinancialReport(),
             ),
             GoRoute(
-              name: 'Medicine-report',
-              path: '/medicine-report',
+              name: 'MedicineReport',
+              path: 'medicine-report',
               builder: (context, state) => const MedicineReport(),
             ),
           ],
@@ -113,6 +135,7 @@ class MyApp extends StatelessWidget {
       theme: config.getAppTheme(),
       routerConfig: router,
       restorationScopeId: 'app',
+
     );
     // return MaterialApp(
     //   title: 'PharmaEase',

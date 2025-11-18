@@ -168,26 +168,11 @@ class _ActivityLogState extends State<ActivityLog> {
               },
               icon: Icon(Icons.arrow_back),
             ),
-            Icon(Icons.bar_chart_rounded, color: Config.primaryGreen),
+            Image.asset('assets/images/app_logo.png', width: 40),
             SizedBox(width: 8),
             Text('Pharma Ease'),
           ],
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              backgroundColor: Config.accentBlue,
-              child: Text(
-                'H',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
