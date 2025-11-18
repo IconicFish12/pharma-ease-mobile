@@ -54,18 +54,6 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       FeatureItem(
-        icon: Icons.assessment_outlined,
-        label: 'Finance',
-        onTap: () {
-          context.pushNamed('FinancialReport');
-        },
-      ),
-      FeatureItem(
-        icon: Icons.medication_outlined,
-        label: 'Medicine',
-        onTap: () {},
-      ),
-      FeatureItem(
         icon: Icons.summarize_outlined,
         label: 'All Report',
         onTap: () {
@@ -115,7 +103,7 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: false,
         title: Row(
           children: [
-            Icon(Icons.bar_chart_rounded, color: Config.primaryGreen),
+            Image.asset('assets/images/app_logo.png', width: 40),
             SizedBox(width: 8),
             Text('Pharma Ease'),
           ],
@@ -125,13 +113,16 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
               backgroundColor: Config.accentBlue,
-              child: Text(
-                'H',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+              child: TextButton(
+                onPressed: () => context.pushNamed('UserProfile'), 
+                child: Text(
+                  'H',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
+              )
             ),
           ),
         ],

@@ -116,21 +116,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
           icon: Icon(Icons.arrow_back, color: Config.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              backgroundColor: Config.accentBlue,
-              child: Text(
-                'A',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: CustomScrollView(
         slivers: [
@@ -241,7 +226,6 @@ class UserListItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: user.roleColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),

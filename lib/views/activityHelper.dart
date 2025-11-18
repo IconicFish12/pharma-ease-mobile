@@ -7,9 +7,9 @@ Future<void> exportCSVwithSAF(List<Map<String, String>> logs, String fileName) a
   String csv = "${headers.join(",")}\n";
 
   for (var row in logs) {
-    csv += headers
+    csv += "${headers
         .map((key) => row[key]!.replaceAll(",", ";"))
-        .join(",") + "\n";
+        .join(",")}\n";
   }
 
   // Convert ke bytes

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../config/config.dart';
 import 'activityHelper.dart';
+import 'package:intl/intl.dart';
 
 class ActivityLog extends StatefulWidget {
   const ActivityLog({super.key});
@@ -109,13 +111,23 @@ class _ActivityLogState extends State<ActivityLog> {
     "Purchase Orders",
   ];
 
-  // warna untuk badge action
+  // (PERBAIKAN) warna dan ikon untuk badge action
+  // Menggunakan warna dari Config
   final Map<String, Color> actionColors = {
-    'Login': Colors.green,
-    'Create': Colors.blue,
+    'Login': Config.successGreen,
+    'Create': Config.accentBlue,
     'Update': Colors.orange,
-    'Failed Login': Colors.red,
-    'Delete': Colors.redAccent,
+    'Failed Login': Config.errorRed,
+    'Delete': Config.errorRed,
+  };
+
+  // (BARU) Ikon untuk setiap aksi
+  final Map<String, IconData> actionIcons = {
+    'Login': Icons.login_outlined,
+    'Create': Icons.add_circle_outline,
+    'Update': Icons.edit_outlined,
+    'Failed Login': Icons.warning_amber_rounded,
+    'Delete': Icons.delete_outline,
   };
 
   @override
@@ -147,7 +159,12 @@ class _ActivityLogState extends State<ActivityLog> {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                // (PERBAIKAN) Menggunakan context.pop() dari go_router
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/home'); // Fallback ke home
+                }
               },
               icon: Icon(Icons.arrow_back),
             ),
@@ -272,7 +289,7 @@ class _ActivityLogState extends State<ActivityLog> {
                                 }
                               },
                               icon: const Icon(Icons.download),
-                              label: const Text("Export Activity Log"),
+                              label: const Text("Export"),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF356B52),
                                 foregroundColor: Colors.white,
@@ -308,7 +325,7 @@ class _ActivityLogState extends State<ActivityLog> {
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      initialValue: selectedAction,
+                      value: selectedAction,
                       items: actions
                           .map(
                             (a) => DropdownMenuItem(value: a, child: Text(a)),
@@ -325,7 +342,7 @@ class _ActivityLogState extends State<ActivityLog> {
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      initialValue: selectedModule,
+                      value: selectedModule,
                       items: modules
                           .map(
                             (m) => DropdownMenuItem(value: m, child: Text(m)),
@@ -337,62 +354,108 @@ class _ActivityLogState extends State<ActivityLog> {
 
                     const SizedBox(height: 20),
 
-                    // table (horizontal scroll)
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        // minimal styling
-                        headingRowColor: WidgetStateProperty.resolveWith(
-                          (states) => const Color(0xFFF4F4F4),
-                        ),
-                        columns: const [
-                          DataColumn(label: Text("Timestamp")),
-                          DataColumn(label: Text("User")),
-                          DataColumn(label: Text("Role")),
-                          DataColumn(label: Text("Action")),
-                          DataColumn(label: Text("Module")),
-                          DataColumn(label: Text("Details")),
-                          DataColumn(label: Text("IP Address")),
-                        ],
-                        rows: filteredLogs.map((r) {
-                          final action = r['action']!;
-                          final color = actionColors[action] ?? Colors.grey;
-                          return DataRow(
-                            cells: [
-                              DataCell(Text(r['timestamp']!)),
-                              DataCell(Text(r['user']!)),
-                              DataCell(Text(r['role']!)),
-                              DataCell(
-                                Chip(
-                                  label: Text(
-                                    action,
-                                    style: TextStyle(color: color),
-                                  ),
-                                  backgroundColor: color.withOpacity(0.12),
-                                ),
-                              ),
-                              DataCell(Text(r['module']!)),
-                              DataCell(
-                                SizedBox(
-                                  width: 300,
-                                  child: Text(
-                                    r['details']!,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ),
-                              DataCell(Text(r['ip']!)),
-                            ],
-                          );
-                        }).toList(),
-                      ),
+                    // --- (PERUBAHAN TOTAL DI SINI) ---
+                    // Mengganti DataTable dengan ListView.builder
+                    ListView.builder(
+                      itemCount: filteredLogs.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final log = filteredLogs[index];
+                        final action = log['action']!;
+                        final color = actionColors[action] ?? Colors.grey;
+                        final icon = actionIcons[action] ?? Icons.info_outline;
+
+                        return _ActivityLogItem(
+                          log: log,
+                          actionColor: color,
+                          actionIcon: icon,
+                          onTap: () {
+                            _showLogDetailsDialog(context, log, color, icon);
+                          },
+                        );
+                      },
                     ),
+                    // --- (AKHIR DARI PERUBAHAN) ---
                   ],
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // (BARU) Dialog untuk menampilkan detail log
+  void _showLogDetailsDialog(
+    BuildContext context,
+    Map<String, String> log,
+    Color actionColor,
+    IconData actionIcon,
+  ) {
+    final textTheme = Theme.of(context).textTheme;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(actionIcon, color: actionColor),
+              SizedBox(width: 8),
+              Text(
+                'Log Details: ${log['action']}',
+                style: textTheme.titleLarge?.copyWith(color: actionColor),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDetailRow(context, 'Timestamp:', log['timestamp']!),
+                _buildDetailRow(context, 'User:', log['user']!),
+                _buildDetailRow(context, 'Role:', log['role']!),
+                _buildDetailRow(context, 'Module:', log['module']!),
+                _buildDetailRow(context, 'Details:', log['details']!),
+                _buildDetailRow(context, 'IP Address:', log['ip']!),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Close',
+                style: TextStyle(color: Config.primaryGreen),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // (BARU) Helper widget untuk baris detail di dialog
+  Widget _buildDetailRow(BuildContext context, String label, String value) {
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: textTheme.bodyMedium?.copyWith(color: Config.textSecondary),
+          ),
+          SizedBox(height: 2),
+          Text(value, style: textTheme.bodyLarge,
+          ),
+        ],
       ),
     );
   }
@@ -406,5 +469,97 @@ class _ActivityLogState extends State<ActivityLog> {
         borderSide: BorderSide.none,
       ),
     );
+  }
+}
+
+class _ActivityLogItem extends StatelessWidget {
+  final Map<String, String> log;
+  final Color actionColor;
+  final IconData actionIcon;
+  final VoidCallback onTap;
+
+  const _ActivityLogItem({
+    required this.log,
+    required this.actionColor,
+    required this.actionIcon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      elevation: 1, // Elevasi halus
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: ListTile(
+        onTap: onTap, // Aksi interaktif
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: CircleAvatar(
+          backgroundColor: actionColor.withOpacity(0.1),
+          child: Icon(actionIcon, color: actionColor, size: 20),
+        ),
+        title: Text.rich(
+          TextSpan(
+            style: textTheme.bodyLarge,
+            children: [
+              TextSpan(
+                text: log['user'],
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              TextSpan(
+                text: ' (${log['role']})',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: Config.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 4),
+            Text(
+              log['details']!,
+              style: textTheme.bodyMedium,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 4),
+            Text(
+              // Format tanggal agar lebih mudah dibaca
+              _formatTimestamp(log['timestamp']!),
+              style: textTheme.bodySmall?.copyWith(color: Config.textSecondary),
+            ),
+          ],
+        ),
+        trailing: Chip(
+          label: Text(
+            log['action']!,
+            style: textTheme.labelSmall?.copyWith(
+              color: actionColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: actionColor.withOpacity(0.1),
+          padding: EdgeInsets.zero,
+        ),
+        isThreeLine: true,
+      ),
+    );
+  }
+
+  // (BARU) Helper untuk memformat tanggal
+  String _formatTimestamp(String timestamp) {
+    try {
+      final dateTime = DateTime.parse(timestamp);
+      // Format: 20 Okt 2025, 09:45
+      return DateFormat('dd MMM yyyy, HH:mm').format(dateTime);
+    } catch (e) {
+      return timestamp; // Kembalikan teks asli jika format gagal
+    }
   }
 }

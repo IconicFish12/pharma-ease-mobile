@@ -114,21 +114,6 @@ class _SupplierListState extends State<SupplierList> {
           icon: Icon(Icons.arrow_back, color: Config.textPrimary),
           onPressed: () => context.pop(),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              backgroundColor: Config.accentBlue,
-              child: Text(
-                'A',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: CustomScrollView(
         slivers: [

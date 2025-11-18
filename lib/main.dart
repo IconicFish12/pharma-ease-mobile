@@ -10,10 +10,10 @@ import 'package:mobile_course_fp/views/notifications.dart';
 import 'package:mobile_course_fp/views/reports/financial_report.dart';
 import 'package:mobile_course_fp/views/reports/medicine_report.dart';
 import 'package:mobile_course_fp/views/reports/reports.dart';
+import 'package:mobile_course_fp/views/splash_screen.dart';
 import 'package:mobile_course_fp/views/suppliers/medicine_supplies.dart';
 import 'package:mobile_course_fp/views/suppliers/supplier_list.dart';
 import 'package:mobile_course_fp/views/users/profile_page.dart';
-// import 'package:mobile_course_fp/views/splash_screen.dart';
 import 'package:mobile_course_fp/views/users/user_management_page.dart';
 
 void main() {
@@ -30,7 +30,12 @@ class MyApp extends StatelessWidget {
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const HomePage()),
+        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+        GoRoute(
+          path: '/home',
+          name: 'Home',
+          builder: (context, state) => const HomePage(),
+        ),
         GoRoute(
           name: 'MedicineInventory',
           path: '/inventory',
@@ -109,5 +114,11 @@ class MyApp extends StatelessWidget {
       routerConfig: router,
       restorationScopeId: 'app',
     );
+    // return MaterialApp(
+    //   title: 'PharmaEase',
+    //   debugShowCheckedModeBanner: false,
+    //   theme: config.getAppTheme(),
+    //   home: UserManagementPage(),
+    // );
   }
 }

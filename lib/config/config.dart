@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Config {
   static const Color primaryGreen = Color(0xFF3A653F);
@@ -20,37 +21,38 @@ class Config {
         error: errorRed,
         brightness: Brightness.light,
       ),
-      fontFamily: 'Poppins',
-      textTheme: const TextTheme(
-        headlineLarge: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 24,
-          color: textPrimary,
-        ),
-        // Judul yang lebih kecil untuk bagian
-        headlineMedium: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-          color: textPrimary,
-        ),
-        // Judul untuk kartu
-        titleLarge: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-          color: textPrimary,
-        ),
-        bodyLarge: TextStyle(fontSize: 16, color: textPrimary),
-        bodyMedium: TextStyle(fontSize: 14, color: textSecondary),
-        labelSmall: TextStyle(
-          fontSize: 12,
-          color: textPrimary,
-          fontWeight: FontWeight.w600,
-        ),
-        labelLarge: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-          color: Colors.white,
-        ),
+      textTheme: GoogleFonts.poppinsTextTheme(
+        TextTheme(
+          headlineLarge: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: textPrimary,
+          ),
+          // Judul yang lebih kecil untuk bagian
+          headlineMedium: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: textPrimary,
+          ),
+          // Judul untuk kartu
+          titleLarge: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: textPrimary,
+          ),
+          bodyLarge: TextStyle(fontSize: 16, color: textPrimary),
+          bodyMedium: TextStyle(fontSize: 14, color: textSecondary),
+          labelSmall: TextStyle(
+            fontSize: 12,
+            color: textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+          labelLarge: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.white,
+          ),
+        )
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
