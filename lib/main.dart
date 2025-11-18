@@ -11,6 +11,7 @@ import 'package:mobile_course_fp/views/cashier/transaction_summary.dart';
 import 'package:mobile_course_fp/views/home.dart';
 import 'package:mobile_course_fp/views/medicine/medicine_list.dart';
 import 'package:mobile_course_fp/views/notifications.dart';
+import 'package:mobile_course_fp/views/order/order_list.dart';
 import 'package:mobile_course_fp/views/reports/financial_report.dart';
 import 'package:mobile_course_fp/views/reports/medicine_report.dart';
 import 'package:mobile_course_fp/views/reports/reports.dart';
@@ -19,6 +20,8 @@ import 'package:mobile_course_fp/views/suppliers/medicine_supplies.dart';
 import 'package:mobile_course_fp/views/suppliers/supplier_list.dart';
 import 'package:mobile_course_fp/views/users/profile_page.dart';
 import 'package:mobile_course_fp/views/users/user_management_page.dart';
+import 'package:mobile_course_fp/views/order/order_detail.dart';
+import 'package:mobile_course_fp/views/order/order_list.dart';
 
 void main() {
   initializeDateFormatting('id_ID', '').then((_) {
@@ -36,7 +39,7 @@ class MyApp extends StatelessWidget {
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+        GoRoute(path: '/', builder: (context, state) => const OrderList()),
         GoRoute(
           path: '/home',
           name: 'Home',
@@ -55,7 +58,7 @@ class MyApp extends StatelessWidget {
             GoRoute(
               name: 'SuppliersOrder',
               path: 'medicine-order',
-              builder: (context, state) => const MedicineSuppliesOrder(),
+              builder: (context, state) => const OrderList(),
             ),
           ],
         ),
@@ -99,6 +102,7 @@ class MyApp extends StatelessWidget {
                 return TransactionDetailPage(cartItems: cartItems ?? []);
               },
             ),
+            
             GoRoute(
               name: 'Receipt',
               path: 'receipt', 
