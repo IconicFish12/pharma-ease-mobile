@@ -24,8 +24,8 @@ class _OrderListState extends State<OrderList> {
       orderDate: "2025-02-01",
       expectedDeliveryDate: "2025-02-10",
       items: [
-        OrderItem(name: "Paracetamol", price: 100, amount: 3),
-        OrderItem(name: "Amoxicillin", price: 150, amount: 2),
+        OrderItem(name: "Paracetamol", price: 100000, amount: 3),
+        OrderItem(name: "Amoxicillin", price: 150000, amount: 2),
       ],
     ),
     Order(
@@ -40,8 +40,8 @@ class _OrderListState extends State<OrderList> {
       status: OrderStatus.failed,
       expectedDeliveryDate: "2025-02-05",
       items: [
-        OrderItem(name: "Ibuprofen", price: 200, amount: 2),
-        OrderItem(name: "Syringe Pack", price: 150, amount: 1),
+        OrderItem(name: "Ibuprofen", price: 200000, amount: 2),
+        OrderItem(name: "Paracetamol", price: 150000, amount: 1),
       ],
     ),
   ];
@@ -95,8 +95,8 @@ class _OrderListState extends State<OrderList> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
         backgroundColor: Config.primaryGreen,
-        label: const Text("Add New Order"),
-        icon: const Icon(Icons.add_business_outlined),
+        label: Text("Add New Order"),
+        icon: Icon(Icons.trolley),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -106,7 +106,7 @@ class _OrderListState extends State<OrderList> {
     return TextField(
       decoration: InputDecoration(
         hintText: "Search orders...",
-        prefixIcon: const Icon(Icons.search),
+        prefixIcon: Icon(Icons.search),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -164,18 +164,17 @@ class OrderListItem extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 12),
-
+              SizedBox(height: 12),
               _infoRow(Icons.store_mall_directory, order.suppliersName),
-              const SizedBox(height: 8),
-
+              SizedBox(height: 8),
               _infoRow(Icons.calendar_month, "Order: ${order.orderDate}"),
-              const SizedBox(height: 8),
-
+              SizedBox(height: 8),
               _infoRow(
                 Icons.inventory_2,
-                "${order.totalItemsOrdered} items • \$${order.totalAmount}",
+                "${order.totalItemsOrdered} items",
               ),
+              SizedBox(height: 8),
+              _infoRow(Icons.monetization_on_sharp, "Rp.${order.totalAmount}")
             ],
           ),
         ),
@@ -187,7 +186,7 @@ class OrderListItem extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, size: 16, color: Config.textSecondary),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Text(text),
       ],
     );
