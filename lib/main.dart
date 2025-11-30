@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_course_fp/config/config.dart';
+import 'package:mobile_course_fp/firebase_options.dart';
 import 'package:mobile_course_fp/views/activity_log.dart';
 import 'package:mobile_course_fp/views/cashier/cashier_menu.dart';
 import 'package:mobile_course_fp/views/cashier/cashier_model.dart';
@@ -11,19 +13,25 @@ import 'package:mobile_course_fp/views/cashier/transaction_summary.dart';
 import 'package:mobile_course_fp/views/home.dart';
 import 'package:mobile_course_fp/views/medicine/medicine_list.dart';
 import 'package:mobile_course_fp/views/notifications.dart';
+import 'package:mobile_course_fp/views/order/order_detail.dart';
 import 'package:mobile_course_fp/views/order/order_list.dart';
+import 'package:mobile_course_fp/views/order/order_model.dart';
 import 'package:mobile_course_fp/views/reports/financial_report.dart';
 import 'package:mobile_course_fp/views/reports/medicine_report.dart';
 import 'package:mobile_course_fp/views/reports/reports.dart';
 import 'package:mobile_course_fp/views/splash_screen.dart';
-import 'package:mobile_course_fp/views/suppliers/medicine_supplies.dart';
 import 'package:mobile_course_fp/views/suppliers/supplier_list.dart';
 import 'package:mobile_course_fp/views/users/profile_page.dart';
 import 'package:mobile_course_fp/views/users/user_management_page.dart';
-import 'package:mobile_course_fp/views/order/order_detail.dart';
-import 'package:mobile_course_fp/views/order/order_list.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+    demoProjectId: 'pharma-ease',
+    name: 'pharma-ease',
+  );
+
   initializeDateFormatting('id_ID', '').then((_) {
     runApp(const MyApp());
   });
@@ -39,7 +47,7 @@ class MyApp extends StatelessWidget {
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const OrderList()),
+        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
         GoRoute(
           path: '/home',
           name: 'Home',
@@ -59,6 +67,14 @@ class MyApp extends StatelessWidget {
               name: 'SuppliersOrder',
               path: 'medicine-order',
               builder: (context, state) => const OrderList(),
+            ),
+            GoRoute(
+              name: 'OrderDetail',
+              path: 'order-detail',
+              builder: (context, state) {
+                final order = state.extra as Order;
+                return OrderDetailPage(order: order);
+              },
             ),
           ],
         ),

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "125905647168",
+    "project_id": "pharma-ease",
+    "storage_bucket": "pharma-ease.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:125905647168:android:71394bf7478076442f51a5",
+        "android_client_info": {
+          "package_name": "com.example.mobile_course_fp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7hHI-FfUaiCJhPVnkau3ZGyYb5rVu7Qs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

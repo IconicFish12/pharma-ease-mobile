@@ -240,7 +240,7 @@ class UserListItem extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              // padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: user.statusColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),

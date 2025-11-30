@@ -310,7 +310,7 @@ class _ActivityLogState extends State<ActivityLog> {
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      value: selectedAction,
+                      initialValue: selectedAction,
                       items: actions
                           .map(
                             (a) => DropdownMenuItem(value: a, child: Text(a)),
@@ -327,7 +327,7 @@ class _ActivityLogState extends State<ActivityLog> {
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      value: selectedModule,
+                      initialValue: selectedModule,
                       items: modules
                           .map(
                             (m) => DropdownMenuItem(value: m, child: Text(m)),

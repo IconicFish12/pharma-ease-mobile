@@ -284,7 +284,7 @@ class _TransactionSummaryState extends State<TransactionSummary> {
             ),
             SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _selectedCashier,
+              initialValue: _selectedCashier,
               decoration: InputDecoration(labelText: 'Filter by Cashier'),
               items: _cashiers
                   .map(
