@@ -25,7 +25,6 @@ class OrderDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -33,15 +32,15 @@ class OrderDetailPage extends StatelessWidget {
               ),
               margin: EdgeInsets.zero,
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(order.suppliersName, style: textTheme.headlineMedium),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text("Order to ${order.suppliersName}",
                         style: textTheme.bodyMedium),
-                    const Divider(height: 24),
+                    Divider(height: 24),
 
                     _buildDetailRow(
                       context,
@@ -149,8 +148,7 @@ class OrderDetailPage extends StatelessWidget {
                 ),
               ),
             ),
-
-            const SizedBox(height: 40),
+            SizedBox(height: 40),
           ],
         ),
       ),
