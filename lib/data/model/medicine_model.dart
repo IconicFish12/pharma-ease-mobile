@@ -66,9 +66,9 @@ class Datum {
     @JsonKey(name: "suplier")
     final Suplier? suplier;
     @JsonKey(name: "createdAt")
-    final String? createdAt;
+    final DateTime? createdAt;
     @JsonKey(name: "updatedAt")
-    final String? updatedAt;
+    final DateTime? updatedAt;
 
     Datum({
         this.id,
@@ -92,8 +92,8 @@ class Datum {
         String? price,
         Category? category,
         Suplier? suplier,
-        String? createdAt,
-        String? updatedAt,
+        DateTime? createdAt,
+        DateTime? updatedAt,
     }) => 
         Datum(
             id: id ?? this.id,
@@ -120,9 +120,9 @@ class Category {
     @JsonKey(name: "categoryName")
     final String? categoryName;
     @JsonKey(name: "createdAt")
-    final String? createdAt;
+    final DateTime? createdAt;
     @JsonKey(name: "updatedAt")
-    final String? updatedAt;
+    final DateTime? updatedAt;
 
     Category({
         this.id,
@@ -134,8 +134,8 @@ class Category {
     Category copyWith({
         String? id,
         String? categoryName,
-        String? createdAt,
-        String? updatedAt,
+        DateTime? createdAt,
+        DateTime? updatedAt,
     }) => 
         Category(
             id: id ?? this.id,
@@ -162,9 +162,9 @@ class Suplier {
     @JsonKey(name: "address")
     final String? address;
     @JsonKey(name: "createdAt")
-    final String? createdAt;
+    final DateTime? createdAt;
     @JsonKey(name: "updatedAt")
-    final String? updatedAt;
+    final DateTime? updatedAt;
 
     Suplier({
         this.id,
@@ -182,8 +182,8 @@ class Suplier {
         String? contactPerson,
         dynamic phone,
         String? address,
-        String? createdAt,
-        String? updatedAt,
+        DateTime? createdAt,
+        DateTime? updatedAt,
     }) => 
         Suplier(
             id: id ?? this.id,

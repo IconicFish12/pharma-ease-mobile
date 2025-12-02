@@ -54,9 +54,9 @@ class Datum {
     @JsonKey(name: "categoryName")
     final String? categoryName;
     @JsonKey(name: "createdAt")
-    final AtedAt? createdAt;
+    final DateTime? createdAt;
     @JsonKey(name: "updatedAt")
-    final AtedAt? updatedAt;
+    final DateTime? updatedAt;
 
     Datum({
         this.id,
@@ -68,8 +68,8 @@ class Datum {
     Datum copyWith({
         String? id,
         String? categoryName,
-        AtedAt? createdAt,
-        AtedAt? updatedAt,
+        DateTime? createdAt,
+        DateTime? updatedAt,
     }) => 
         Datum(
             id: id ?? this.id,
@@ -82,15 +82,6 @@ class Datum {
 
     Map<String, dynamic> toJson() => _$DatumToJson(this);
 }
-
-enum AtedAt {
-    @JsonValue("3 hari yang lalu")
-    THE_3_HARI_YANG_LALU
-}
-
-final atedAtValues = EnumValues({
-    "3 hari yang lalu": AtedAt.THE_3_HARI_YANG_LALU
-});
 
 @JsonSerializable()
 class Meta {
@@ -126,16 +117,4 @@ class Meta {
     factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
 
     Map<String, dynamic> toJson() => _$MetaToJson(this);
-}
-
-class EnumValues<T> {
-    Map<String, T> map;
-    late Map<T, String> reverseMap;
-
-    EnumValues(this.map);
-
-    Map<T, String> get reverse {
-            reverseMap = map.map((k, v) => MapEntry(v, k));
-            return reverseMap;
-    }
 }

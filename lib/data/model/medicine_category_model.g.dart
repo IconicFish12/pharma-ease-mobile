@@ -31,18 +31,20 @@ Map<String, dynamic> _$MedicineCategoryModelToJson(
 Datum _$DatumFromJson(Map<String, dynamic> json) => Datum(
   id: json['id'] as String?,
   categoryName: json['categoryName'] as String?,
-  createdAt: $enumDecodeNullable(_$AtedAtEnumMap, json['createdAt']),
-  updatedAt: $enumDecodeNullable(_$AtedAtEnumMap, json['updatedAt']),
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$DatumToJson(Datum instance) => <String, dynamic>{
   'id': instance.id,
   'categoryName': instance.categoryName,
-  'createdAt': _$AtedAtEnumMap[instance.createdAt],
-  'updatedAt': _$AtedAtEnumMap[instance.updatedAt],
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
 };
-
-const _$AtedAtEnumMap = {AtedAt.THE_3_HARI_YANG_LALU: '3 hari yang lalu'};
 
 Meta _$MetaFromJson(Map<String, dynamic> json) => Meta(
   currentPage: (json['current_page'] as num?)?.toInt(),

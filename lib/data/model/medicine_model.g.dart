@@ -39,8 +39,12 @@ Datum _$DatumFromJson(Map<String, dynamic> json) => Datum(
   suplier: json['suplier'] == null
       ? null
       : Suplier.fromJson(json['suplier'] as Map<String, dynamic>),
-  createdAt: json['createdAt'] as String?,
-  updatedAt: json['updatedAt'] as String?,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$DatumToJson(Datum instance) => <String, dynamic>{
@@ -52,22 +56,26 @@ Map<String, dynamic> _$DatumToJson(Datum instance) => <String, dynamic>{
   'price': instance.price,
   'category': instance.category,
   'suplier': instance.suplier,
-  'createdAt': instance.createdAt,
-  'updatedAt': instance.updatedAt,
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
 };
 
 Category _$CategoryFromJson(Map<String, dynamic> json) => Category(
   id: json['id'] as String?,
   categoryName: json['categoryName'] as String?,
-  createdAt: json['createdAt'] as String?,
-  updatedAt: json['updatedAt'] as String?,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$CategoryToJson(Category instance) => <String, dynamic>{
   'id': instance.id,
   'categoryName': instance.categoryName,
-  'createdAt': instance.createdAt,
-  'updatedAt': instance.updatedAt,
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
 };
 
 Suplier _$SuplierFromJson(Map<String, dynamic> json) => Suplier(
@@ -76,8 +84,12 @@ Suplier _$SuplierFromJson(Map<String, dynamic> json) => Suplier(
   contactPerson: json['contactPerson'] as String?,
   phone: json['phone'],
   address: json['address'] as String?,
-  createdAt: json['createdAt'] as String?,
-  updatedAt: json['updatedAt'] as String?,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$SuplierToJson(Suplier instance) => <String, dynamic>{
@@ -86,8 +98,8 @@ Map<String, dynamic> _$SuplierToJson(Suplier instance) => <String, dynamic>{
   'contactPerson': instance.contactPerson,
   'phone': instance.phone,
   'address': instance.address,
-  'createdAt': instance.createdAt,
-  'updatedAt': instance.updatedAt,
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
 };
 
 Meta _$MetaFromJson(Map<String, dynamic> json) => Meta(

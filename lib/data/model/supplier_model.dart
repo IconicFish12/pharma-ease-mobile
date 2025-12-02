@@ -7,12 +7,12 @@ import 'dart:convert';
 
 part 'supplier_model.g.dart';
 
-SuppliersModel suppliersModelFromMap(String str) => SuppliersModel.fromJson(json.decode(str));
+SupplierModel supplierModelFromMap(String str) => SupplierModel.fromJson(json.decode(str));
 
-String suppliersModelToMap(SuppliersModel data) => json.encode(data.toJson());
+String supplierModelToMap(SupplierModel data) => json.encode(data.toJson());
 
 @JsonSerializable()
-class SuppliersModel {
+class SupplierModel {
     @JsonKey(name: "status")
     final String? status;
     @JsonKey(name: "message")
@@ -22,29 +22,29 @@ class SuppliersModel {
     @JsonKey(name: "meta")
     final Meta? meta;
 
-    SuppliersModel({
+    SupplierModel({
         this.status,
         this.message,
         this.data,
         this.meta,
     });
 
-    SuppliersModel copyWith({
+    SupplierModel copyWith({
         String? status,
         String? message,
         List<Datum>? data,
         Meta? meta,
     }) => 
-        SuppliersModel(
+        SupplierModel(
             status: status ?? this.status,
             message: message ?? this.message,
             data: data ?? this.data,
             meta: meta ?? this.meta,
         );
 
-    factory SuppliersModel.fromJson(Map<String, dynamic> json) => _$SuppliersModelFromJson(json);
+    factory SupplierModel.fromJson(Map<String, dynamic> json) => _$SupplierModelFromJson(json);
 
-    Map<String, dynamic> toJson() => _$SuppliersModelToJson(this);
+    Map<String, dynamic> toJson() => _$SupplierModelToJson(this);
 }
 
 @JsonSerializable()
@@ -60,9 +60,9 @@ class Datum {
     @JsonKey(name: "address")
     final String? address;
     @JsonKey(name: "createdAt")
-    final AtedAt? createdAt;
+    final DateTime? createdAt;
     @JsonKey(name: "updatedAt")
-    final AtedAt? updatedAt;
+    final DateTime? updatedAt;
 
     Datum({
         this.id,
@@ -80,8 +80,8 @@ class Datum {
         String? contactPerson,
         dynamic phone,
         String? address,
-        AtedAt? createdAt,
-        AtedAt? updatedAt,
+        DateTime? createdAt,
+        DateTime? updatedAt,
     }) => 
         Datum(
             id: id ?? this.id,
@@ -97,15 +97,6 @@ class Datum {
 
     Map<String, dynamic> toJson() => _$DatumToJson(this);
 }
-
-enum AtedAt {
-    @JsonValue("3 hari yang lalu")
-    THE_3_HARI_YANG_LALU
-}
-
-final atedAtValues = EnumValues({
-    "3 hari yang lalu": AtedAt.THE_3_HARI_YANG_LALU
-});
 
 @JsonSerializable()
 class Meta {
@@ -141,16 +132,4 @@ class Meta {
     factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
 
     Map<String, dynamic> toJson() => _$MetaToJson(this);
-}
-
-class EnumValues<T> {
-    Map<String, T> map;
-    late Map<T, String> reverseMap;
-
-    EnumValues(this.map);
-
-    Map<T, String> get reverse {
-            reverseMap = map.map((k, v) => MapEntry(v, k));
-            return reverseMap;
-    }
 }

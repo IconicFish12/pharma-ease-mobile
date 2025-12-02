@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,6 +11,8 @@ class Config {
   static const Color textSecondary = Color(0xFF757575);
   static const Color errorRed = Color(0xFFD32F2F);
   static const Color successGreen = Color(0xFF388E3C);
+
+  static final Dio dio = Dio();
 
   ThemeData getAppTheme() {
     return ThemeData(

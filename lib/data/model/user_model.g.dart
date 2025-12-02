@@ -36,8 +36,12 @@ Datum _$DatumFromJson(Map<String, dynamic> json) => Datum(
   salary: json['salary'] as String?,
   startDate: json['start_date'] as String?,
   avatar: json['avatar'],
-  createdAt: json['createdAt'] as String?,
-  updatedAt: json['updatedAt'] as String?,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$DatumToJson(Datum instance) => <String, dynamic>{
@@ -52,8 +56,8 @@ Map<String, dynamic> _$DatumToJson(Datum instance) => <String, dynamic>{
   'salary': instance.salary,
   'start_date': instance.startDate,
   'avatar': instance.avatar,
-  'createdAt': instance.createdAt,
-  'updatedAt': instance.updatedAt,
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
 };
 
 Meta _$MetaFromJson(Map<String, dynamic> json) => Meta(

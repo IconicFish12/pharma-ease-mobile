@@ -6,8 +6,8 @@ part of 'supplier_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-SuppliersModel _$SuppliersModelFromJson(Map<String, dynamic> json) =>
-    SuppliersModel(
+SupplierModel _$SupplierModelFromJson(Map<String, dynamic> json) =>
+    SupplierModel(
       status: json['status'] as String?,
       message: json['message'] as String?,
       data: (json['data'] as List<dynamic>?)
@@ -18,7 +18,7 @@ SuppliersModel _$SuppliersModelFromJson(Map<String, dynamic> json) =>
           : Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$SuppliersModelToJson(SuppliersModel instance) =>
+Map<String, dynamic> _$SupplierModelToJson(SupplierModel instance) =>
     <String, dynamic>{
       'status': instance.status,
       'message': instance.message,
@@ -32,8 +32,12 @@ Datum _$DatumFromJson(Map<String, dynamic> json) => Datum(
   contactPerson: json['contactPerson'] as String?,
   phone: json['phone'],
   address: json['address'] as String?,
-  createdAt: $enumDecodeNullable(_$AtedAtEnumMap, json['createdAt']),
-  updatedAt: $enumDecodeNullable(_$AtedAtEnumMap, json['updatedAt']),
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$DatumToJson(Datum instance) => <String, dynamic>{
@@ -42,11 +46,9 @@ Map<String, dynamic> _$DatumToJson(Datum instance) => <String, dynamic>{
   'contactPerson': instance.contactPerson,
   'phone': instance.phone,
   'address': instance.address,
-  'createdAt': _$AtedAtEnumMap[instance.createdAt],
-  'updatedAt': _$AtedAtEnumMap[instance.updatedAt],
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
 };
-
-const _$AtedAtEnumMap = {AtedAt.THE_3_HARI_YANG_LALU: '3 hari yang lalu'};
 
 Meta _$MetaFromJson(Map<String, dynamic> json) => Meta(
   currentPage: (json['current_page'] as num?)?.toInt(),

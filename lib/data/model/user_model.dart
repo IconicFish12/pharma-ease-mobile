@@ -72,9 +72,9 @@ class Datum {
     @JsonKey(name: "avatar")
     final dynamic avatar;
     @JsonKey(name: "createdAt")
-    final String? createdAt;
+    final DateTime? createdAt;
     @JsonKey(name: "updatedAt")
-    final String? updatedAt;
+    final DateTime? updatedAt;
 
     Datum({
         this.id,
@@ -104,8 +104,8 @@ class Datum {
         String? salary,
         String? startDate,
         dynamic avatar,
-        String? createdAt,
-        String? updatedAt,
+        DateTime? createdAt,
+        DateTime? updatedAt,
     }) => 
         Datum(
             id: id ?? this.id,
