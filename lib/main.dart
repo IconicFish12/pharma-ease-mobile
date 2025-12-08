@@ -5,6 +5,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_course_fp/config/config.dart';
 import 'package:mobile_course_fp/firebase_options.dart';
 import 'package:mobile_course_fp/views/activity_log.dart';
+import 'package:mobile_course_fp/views/auth/forgot_password.dart';
+import 'package:mobile_course_fp/views/auth/login.dart';
+import 'package:mobile_course_fp/views/auth/send_email.dart';
 import 'package:mobile_course_fp/views/cashier/cashier_menu.dart';
 import 'package:mobile_course_fp/views/cashier/cashier_model.dart';
 import 'package:mobile_course_fp/views/cashier/receipt.dart';
@@ -48,6 +51,21 @@ class MyApp extends StatelessWidget {
       routerNeglect: true,
       routes: [
         GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+        GoRoute(
+          name: 'Login',
+          path: '/login',
+          builder: (context, state) => const LoginPage(),
+        ),
+        GoRoute(
+          name: 'ForgotPassword',
+          path: '/forgot-password',
+          builder: (context, state) => const ForgotPasswordPage(),
+        ),
+        GoRoute(
+          name: 'SendEmail',
+          path: '/send-email',
+          builder: (context, state) => const SendEmailPage(),
+        ),
         GoRoute(
           path: '/home',
           name: 'Home',
@@ -155,13 +173,12 @@ class MyApp extends StatelessWidget {
       theme: config.getAppTheme(),
       routerConfig: router,
       restorationScopeId: 'app',
-
     );
     // return MaterialApp(
     //   title: 'PharmaEase',
     //   debugShowCheckedModeBanner: false,
     //   theme: config.getAppTheme(),
-    //   home: UserManagementPage(),
+    //   home: LoginPage(),
     // );
   }
 }

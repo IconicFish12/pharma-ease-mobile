@@ -23,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
         // Gunakan context.go() untuk "teleport" ke halaman utama
         // Ini akan mereset tumpukan navigasi, sehingga pengguna
         // tidak bisa menekan "kembali" ke splash screen.
-        context.goNamed('Home');
+        context.goNamed('Login');
       }
     });
   }
