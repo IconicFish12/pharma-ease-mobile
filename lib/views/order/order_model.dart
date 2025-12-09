@@ -68,11 +68,20 @@ enum OrderStatus {
 class OrderItem {
   final String name;
   final double price;
-  final int amount;
+  final int amount; 
 
   OrderItem({
     required this.name,
     required this.price,
     required this.amount,
   });
+
+  static List<OrderItem> catalog = [
+    OrderItem(name: "Paracetamol 500mg", price: 5000, amount: 0),
+    OrderItem(name: "Amoxicillin 500mg", price: 12000, amount: 0),
+    OrderItem(name: "Ibuprofen 400mg", price: 8500, amount: 0),
+    OrderItem(name: "Vitamin C 1000mg", price: 15000, amount: 0),
+    OrderItem(name: "Omeprazole 20mg", price: 25000, amount: 0),
+    OrderItem(name: "Cetirizine 10mg", price: 3000, amount: 0),
+  ];
 }
