@@ -32,7 +32,7 @@ class Order {
     return items.fold(0, (sum, item) => sum + item.amount);
   }
 
-  int get totalAmount {
+  double get totalAmount {
     return items.fold(0, (sum, item) => sum + (item.price * item.amount));
   }
 
@@ -67,7 +67,7 @@ enum OrderStatus {
 
 class OrderItem {
   final String name;
-  final int price;
+  final double price;
   final int amount;
 
   OrderItem({

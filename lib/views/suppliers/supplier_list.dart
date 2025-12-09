@@ -4,15 +4,10 @@ import 'package:mobile_course_fp/views/suppliers/suppliers_detail.dart';
 import 'package:mobile_course_fp/views/suppliers/suppliers_model.dart';
 import '../../config/config.dart';
 
-class SupplierList extends StatefulWidget {
-  const SupplierList({super.key});
 
-  @override
-  State<SupplierList> createState() => _SupplierListState();
-}
 
-class _SupplierListState extends State<SupplierList> {
-  final List<Supplier> _suppliers = [
+class SupplierData {
+  static final List<Supplier> suppliers = [
     Supplier(
       id: 'SUP001',
       suppliersName: 'MediSupply Co.',
@@ -58,25 +53,35 @@ class _SupplierListState extends State<SupplierList> {
       status: SupplierStatus.nonActive,
     ),
   ];
+}
+class SupplierList extends StatefulWidget {
+  const SupplierList({super.key});
+
+  @override
+  State<SupplierList> createState() => _SupplierListState();
+}
+
+class _SupplierListState extends State<SupplierList> {
+  
 
   void _addSupplier(Supplier newSupplier) {
     setState(() {
-      _suppliers.add(newSupplier); // Pastikan status terupdate saat ditambahkan
+      SupplierData.suppliers.add(newSupplier); // Pastikan status terupdate saat ditambahkan
     });
   }
 
   void _updateSupplier(Supplier updateSupplier) {
     setState(() {
-      final index = _suppliers.indexWhere((med) => med.id == updateSupplier.id);
+      final index = SupplierData.suppliers.indexWhere((med) => med.id == updateSupplier.id);
       if (index != -1) {
-        _suppliers[index] = updateSupplier;
+        SupplierData.suppliers[index] = updateSupplier;
       }
     });
   }
 
   void _deleteSupplier(String supplierId) {
     setState(() {
-      _suppliers.removeWhere((med) => med.id == supplierId);
+      SupplierData.suppliers.removeWhere((med) => med.id == supplierId);
     });
   }
 
@@ -135,7 +140,7 @@ class _SupplierListState extends State<SupplierList> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate((context, index) {
-                final supplier = _suppliers[index];
+                final supplier = SupplierData.suppliers[index];
                 return SupplierListItem(
                   supplier: supplier,
                   onTap: () {
@@ -151,7 +156,7 @@ class _SupplierListState extends State<SupplierList> {
                     );
                   },
                 );
-              }, childCount: _suppliers.length),
+              }, childCount: SupplierData.suppliers.length),
             ),
           ),
           SliverToBoxAdapter(child: SizedBox(height: 80)), // Space for FAB

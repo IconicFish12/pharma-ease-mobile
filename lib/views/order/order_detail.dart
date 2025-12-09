@@ -102,7 +102,7 @@ class OrderDetailPage extends StatelessWidget {
                       context,
                       Icons.payments_outlined,
                       "Amount",
-                      "\$${order.totalAmount}",
+                      "\Rp.${order.totalAmount}",
                     ),
                     _buildDetailRow(
                       context,
@@ -138,7 +138,7 @@ class OrderDetailPage extends StatelessWidget {
                               Text(item.name,
                                   style: textTheme.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.w600)),
-                              Text("${item.amount} pcs • \$${item.price}",
+                              Text("${item.amount} pcs • \Rp.${item.price}",
                                   style: textTheme.bodyMedium),
                             ],
                           ),
