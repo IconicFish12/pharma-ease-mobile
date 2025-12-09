@@ -5,8 +5,6 @@ import 'package:mobile_course_fp/config/config.dart';
 import 'package:mobile_course_fp/views/order/order_detail.dart';
 import 'package:mobile_course_fp/views/order/order_model.dart';
 import 'package:mobile_course_fp/views/suppliers/supplier_list.dart';
-import 'package:mobile_course_fp/views/suppliers/suppliers_model.dart';
-import 'package:mobile_course_fp/views/suppliers/supplier_list.dart';
 import 'dart:math';
 
 class MedicineTemporary {
@@ -143,8 +141,8 @@ void showAddNewOrderBottomSheet(BuildContext context) {
           showAddNewOrderBottomSheet(context);
         },
         backgroundColor: Config.primaryGreen,
-        label: Text("Add New Order"),
-        icon: Icon(Icons.trolley),
+        label: Text("Add New Order", style: TextStyle(color: Colors.white),),
+        icon: Icon(Icons.trolley, color: Colors.white,),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -296,7 +294,6 @@ class _AddOrderModalState extends State<AddOrderModal> {
           price: _selectedMedicine!.price, 
           amount: int.parse(_amountController.text),
         ));
-
         _selectedMedicine = null;
         _amountController.clear(); 
       });
@@ -317,7 +314,6 @@ class _AddOrderModalState extends State<AddOrderModal> {
         );
         return;
       }
-
       _formKey.currentState!.save();
 
       final selectedSupplier = SupplierData.suppliers.firstWhere(
@@ -460,7 +456,6 @@ class _AddOrderModalState extends State<AddOrderModal> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      // harga biar jelas
                       Expanded(
                         flex: 2,
                         child: Container(
