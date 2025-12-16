@@ -12,7 +12,7 @@ extension DatumToDomain on Datum {
       phoneNumber: this.phone?.toString() ?? "-",
       address: this.address ?? "-",
       medicineQuantity: 0, 
-      email: "-",
+      email: "-", 
       whatsappNumber: this.phone?.toString() ?? "-", 
       status: SupplierStatus.active, 
     );
