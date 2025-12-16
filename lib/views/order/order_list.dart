@@ -4,8 +4,58 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_course_fp/config/config.dart';
 import 'package:mobile_course_fp/views/order/order_detail.dart';
 import 'package:mobile_course_fp/views/order/order_model.dart';
-import 'package:mobile_course_fp/views/suppliers/supplier_list.dart';
+import 'package:mobile_course_fp/views/suppliers/View/supplier_list.dart';
 import 'dart:math';
+import 'package:mobile_course_fp/views/suppliers/Model/suppliers_model.dart';
+
+class SupplierData {
+  static final List<Supplier> suppliers = [
+    Supplier(
+      id: 'SUP001',
+      suppliersName: 'MediSupply Co.',
+      contactPerson: 'David Lee',
+      email: 'david@medisupply.com',
+      phoneNumber: '+1-555-0101',
+      whatsappNumber: '+15550101',
+      address: '123 Medical Ave, NY',
+      medicineQuantity: 145,
+      status: SupplierStatus.active,
+    ),
+    Supplier(
+      id: 'SUP002',
+      suppliersName: 'PharmaCorp Ltd.',
+      contactPerson: 'Lisa Chen',
+      email: 'lisa@pharmacorp.com',
+      phoneNumber: '+1-555-0102',
+      whatsappNumber: '+15550102',
+      address: '456 Health St, CA',
+      medicineQuantity: 98,
+      status: SupplierStatus.active,
+    ),
+    Supplier(
+      id: 'SUP003',
+      suppliersName: 'HealthDist Inc.',
+      contactPerson: 'James Wilson',
+      email: 'james@healthdist.com',
+      phoneNumber: '+1-555-0103',
+      whatsappNumber: '+15550103',
+      address: '789 Wellness Rd, TX',
+      medicineQuantity: 203,
+      status: SupplierStatus.active,
+    ),
+    Supplier(
+      id: 'SUP004',
+      suppliersName: 'MedSource Direct',
+      contactPerson: 'Tom Harris',
+      email: 'tom@medsource.com',
+      phoneNumber: '+1-555-0105',
+      whatsappNumber: '+15550105',
+      address: '654 Cure Lane, IL',
+      medicineQuantity: 42,
+      status: SupplierStatus.nonActive,
+    ),
+  ];
+}
 
 class MedicineTemporary {
   final String name;

@@ -92,9 +92,8 @@ class Datum {
             createdAt: createdAt ?? this.createdAt,
             updatedAt: updatedAt ?? this.updatedAt,
         );
-
+        
     factory Datum.fromJson(Map<String, dynamic> json) => _$DatumFromJson(json);
-
     Map<String, dynamic> toJson() => _$DatumToJson(this);
 }
 

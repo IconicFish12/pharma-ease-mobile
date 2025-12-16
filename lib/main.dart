@@ -23,10 +23,12 @@ import 'package:mobile_course_fp/views/reports/financial_report.dart';
 import 'package:mobile_course_fp/views/reports/medicine_report.dart';
 import 'package:mobile_course_fp/views/reports/reports.dart';
 import 'package:mobile_course_fp/views/splash_screen.dart';
-import 'package:mobile_course_fp/views/suppliers/supplier_list.dart';
+import 'package:mobile_course_fp/views/suppliers/View/supplier_list.dart';
 import 'package:mobile_course_fp/views/users/profile_page.dart';
 import 'package:mobile_course_fp/views/users/user_management_page.dart';
 
+import 'package:provider/provider.dart';
+import 'package:mobile_course_fp/views/suppliers/ViewModel/supplier_viewmodel.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -36,7 +38,15 @@ void main() async {
   );
 
   initializeDateFormatting('id_ID', '').then((_) {
-    runApp(const MyApp());
+    runApp(
+      MultiProvider(
+        providers: [
+          // Daftarkan SupplierViewModel
+          ChangeNotifierProvider(create: (_) => SupplierViewModel()),
+        ],
+        child: const MyApp(),
+      ),
+    );
   });
 }
 
@@ -50,7 +60,7 @@ class MyApp extends StatelessWidget {
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+        GoRoute(path: '/', builder: (context, state) => const SupplierList()),
         GoRoute(
           name: 'Login',
           path: '/login',
@@ -84,7 +94,7 @@ class MyApp extends StatelessWidget {
             GoRoute(
               name: 'SuppliersOrder',
               path: 'medicine-order',
-              builder: (context, state) => const OrderList(),
+              builder: (context, state) => const Placeholder(),
             ),
             GoRoute(
               name: 'OrderDetail',

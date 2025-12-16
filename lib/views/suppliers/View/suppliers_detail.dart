@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_course_fp/views/suppliers/suppliers_model.dart';
+import 'package:mobile_course_fp/views/suppliers/Model/suppliers_model.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../config/config.dart';
+import '../../../config/config.dart';
 
 class SuppliersDetail extends StatefulWidget {
   final Supplier supplier;

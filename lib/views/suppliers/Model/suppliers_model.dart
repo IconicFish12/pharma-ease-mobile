@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+// model
 class Supplier {
   final String id;
   String suppliersName;

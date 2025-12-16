@@ -1,59 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_course_fp/views/suppliers/suppliers_detail.dart';
-import 'package:mobile_course_fp/views/suppliers/suppliers_model.dart';
-import '../../config/config.dart';
+import 'package:mobile_course_fp/views/suppliers/View/suppliers_detail.dart';
+import 'package:mobile_course_fp/views/suppliers/Model/suppliers_model.dart';
+import '../../../config/config.dart';
+import 'package:mobile_course_fp/views/suppliers/ViewModel/supplier_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 
-
-class SupplierData {
-  static final List<Supplier> suppliers = [
-    Supplier(
-      id: 'SUP001',
-      suppliersName: 'MediSupply Co.',
-      contactPerson: 'David Lee',
-      email: 'david@medisupply.com',
-      phoneNumber: '+1-555-0101',
-      whatsappNumber: '+15550101',
-      address: '123 Medical Ave, NY',
-      medicineQuantity: 145,
-      status: SupplierStatus.active,
-    ),
-    Supplier(
-      id: 'SUP002',
-      suppliersName: 'PharmaCorp Ltd.',
-      contactPerson: 'Lisa Chen',
-      email: 'lisa@pharmacorp.com',
-      phoneNumber: '+1-555-0102',
-      whatsappNumber: '+15550102',
-      address: '456 Health St, CA',
-      medicineQuantity: 98,
-      status: SupplierStatus.active,
-    ),
-    Supplier(
-      id: 'SUP003',
-      suppliersName: 'HealthDist Inc.',
-      contactPerson: 'James Wilson',
-      email: 'james@healthdist.com',
-      phoneNumber: '+1-555-0103',
-      whatsappNumber: '+15550103',
-      address: '789 Wellness Rd, TX',
-      medicineQuantity: 203,
-      status: SupplierStatus.active,
-    ),
-    Supplier(
-      id: 'SUP004',
-      suppliersName: 'MedSource Direct',
-      contactPerson: 'Tom Harris',
-      email: 'tom@medsource.com',
-      phoneNumber: '+1-555-0105',
-      whatsappNumber: '+15550105',
-      address: '654 Cure Lane, IL',
-      medicineQuantity: 42,
-      status: SupplierStatus.nonActive,
-    ),
-  ];
-}
 class SupplierList extends StatefulWidget {
   const SupplierList({super.key});
 
@@ -62,26 +15,30 @@ class SupplierList extends StatefulWidget {
 }
 
 class _SupplierListState extends State<SupplierList> {
-  
+  // void _addSupplier(Supplier newSupplier) {
+  //   setState(() {
+  //     SupplierData.suppliers.add(newSupplier);
+  //   });
+  // }
 
-  void _addSupplier(Supplier newSupplier) {
-    setState(() {
-      SupplierData.suppliers.add(newSupplier); // Pastikan status terupdate saat ditambahkan
-    });
-  }
+  // void _updateSupplier(Supplier updateSupplier) {
+  //   setState(() {
+  //     final index = SupplierData.suppliers.indexWhere((med) => med.id == updateSupplier.id);
+  //     if (index != -1) {
+  //       SupplierData.suppliers[index] = updateSupplier;
+  //     }
+  //   });
+  // }
 
-  void _updateSupplier(Supplier updateSupplier) {
-    setState(() {
-      final index = SupplierData.suppliers.indexWhere((med) => med.id == updateSupplier.id);
-      if (index != -1) {
-        SupplierData.suppliers[index] = updateSupplier;
-      }
-    });
-  }
+  // void _deleteSupplier(String supplierId) {
+  //   setState(() {
+  //     SupplierData.suppliers.removeWhere((med) => med.id == supplierId);
+  //   });
+  // }
 
-  void _deleteSupplier(String supplierId) {
-    setState(() {
-      SupplierData.suppliers.removeWhere((med) => med.id == supplierId);
+  void _getAllSupplier() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SupplierViewModel>(context, listen: false).fetchSuppliers();
     });
   }
 
@@ -97,7 +54,7 @@ class _SupplierListState extends State<SupplierList> {
         child: AddEditSupplierModal(
           isEditMode: false,
           onSave: (newSupplier) {
-            _addSupplier(newSupplier);
+            // _addSupplier(newSupplier);
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Supplier added successfully!')),
@@ -106,6 +63,12 @@ class _SupplierListState extends State<SupplierList> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    _getAllSupplier();
+    super.initState();
   }
 
   @override
@@ -135,31 +98,81 @@ class _SupplierListState extends State<SupplierList> {
               ]),
             ),
           ),
-          // Daftar Supplier
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final supplier = SupplierData.suppliers[index];
-                return SupplierListItem(
-                  supplier: supplier,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SuppliersDetail(
-                          supplier: supplier,
-                          editSupplier: _updateSupplier,
-                          onDelete: _deleteSupplier,
-                        ),
-                      ),
-                    );
-                  },
+
+          // panggil vm
+          Consumer<SupplierViewModel>(
+            builder: (context, vm, child) {
+              if (vm.isLoading) {
+                return const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
                 );
-              }, childCount: SupplierData.suppliers.length),
-            ),
+              }
+
+              // cek error dari vm
+              if (vm.errorMessage.isNotEmpty) {
+                return SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(vm.errorMessage),
+                          TextButton(
+                            onPressed: () => vm.fetchSuppliers(),
+                            child: const Text("Coba Lagi"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+              // cek data kosong
+              if (vm.suppliers.isEmpty) {
+                return const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Center(child: Text("Belum ada data supplier")),
+                  ),
+                );
+              }
+
+              return SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final supplier = vm.suppliers[index];
+
+                    return SupplierListItem(
+                      supplier: supplier,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SuppliersDetail(
+                              supplier: supplier,
+                              editSupplier: (updatedSupplier) {},
+                              onDelete: (supplierId) {},
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }, childCount: vm.suppliers.length),
+                ),
+              );
+            },
           ),
-          SliverToBoxAdapter(child: SizedBox(height: 80)), // Space for FAB
+          SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
