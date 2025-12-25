@@ -356,7 +356,7 @@ class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
       final newsupplier = Supplier(
         id: widget.isEditMode
             ? widget.supplierToEdit!.id
-            : UniqueKey().toString(), // Gunakan ID lama atau buat baru
+            : UniqueKey().toString(),
         suppliersName: _suppliersName,
         contactPerson: _contactPerson,
         email: _email,

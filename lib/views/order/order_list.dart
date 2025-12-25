@@ -306,7 +306,7 @@ class _AddOrderModalState extends State<AddOrderModal> {
   final TextEditingController _dateController = TextEditingController();
 
   // list sementara sebelum data ditambahin ke model OrderItem
-  List<OrderItem> _tempItems = [];
+  final List<OrderItem> _tempItems = [];
 
   MedicineTemporary? _selectedMedicine; 
   final _amountController = TextEditingController(); 
@@ -423,7 +423,7 @@ class _AddOrderModalState extends State<AddOrderModal> {
                       prefixIcon: Icon(Icons.store),
                       border: OutlineInputBorder(),
                     ),
-                    value: _selectedSupplierId,
+                    initialValue: _selectedSupplierId,
                     items: SupplierData.suppliers.map((supplier) {
                       return DropdownMenuItem(
                         value: supplier.id,
@@ -470,7 +470,7 @@ class _AddOrderModalState extends State<AddOrderModal> {
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 0)
                     ),
-                    value: _selectedMedicine,
+                    initialValue: _selectedMedicine,
                     items: MedicineTemporary.list.map((med) {
                       return DropdownMenuItem(
                         value: med,

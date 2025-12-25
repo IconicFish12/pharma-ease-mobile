@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_course_fp/config/config.dart';
+import 'package:mobile_course_fp/data/provider/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,9 +18,65 @@ class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void handleLogin() async {
+    if (_formKey.currentState!.validate()) {
+      final provider = context.read<AuthProvider>();
+
+      final success = await provider.login(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login Berhasil!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        context.go('/home');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(provider.errorMessage ?? 'Login Gagal'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
+      // Form tidak valid
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields correctly.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Mengambil tema teks dari Config (via context)
     final textTheme = Theme.of(context).textTheme;
+
+    final isLoading = context.select<AuthProvider, bool>(
+      (provider) => provider.state == ViewState.loading,
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -31,7 +89,6 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 40),
-                // Logo atau Header (Opsional, teks saja sudah cukup bagus)
                 Center(
                   child: Column(
                     children: [
@@ -158,13 +215,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 56, // Tinggi tombol lebih modern
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // TODO: Implementasi logika login
-                        // Simulasi login berhasil -> ke Home
-                        context.go('/home');
-                      }
-                    },
+                    onPressed: isLoading ? null : handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Config.primaryGreen,
                       shape: RoundedRectangleBorder(
@@ -172,14 +223,19 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       elevation: 2,
                     ),
-                    child: const Text(
-                      "Sign In",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: isLoading
+                        ? CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          )
+                        : Text(
+                            "Sign In",
+                            style: textTheme.labelLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ],

@@ -14,6 +14,8 @@ class Config {
 
   static final Dio dio = Dio();
 
+  static final String baseURL = "http://localhost:8000/api/";
+
   ThemeData getAppTheme() {
     return ThemeData(
       primaryColor: primaryGreen,

@@ -17,18 +17,16 @@ import 'package:mobile_course_fp/views/home.dart';
 import 'package:mobile_course_fp/views/medicine/medicine_list.dart';
 import 'package:mobile_course_fp/views/notifications.dart';
 import 'package:mobile_course_fp/views/order/order_detail.dart';
-import 'package:mobile_course_fp/views/order/order_list.dart';
 import 'package:mobile_course_fp/views/order/order_model.dart';
 import 'package:mobile_course_fp/views/reports/financial_report.dart';
 import 'package:mobile_course_fp/views/reports/medicine_report.dart';
 import 'package:mobile_course_fp/views/reports/reports.dart';
-import 'package:mobile_course_fp/views/splash_screen.dart';
 import 'package:mobile_course_fp/views/suppliers/View/supplier_list.dart';
 import 'package:mobile_course_fp/views/users/profile_page.dart';
 import 'package:mobile_course_fp/views/users/user_management_page.dart';
-
-import 'package:provider/provider.dart';
 import 'package:mobile_course_fp/views/suppliers/ViewModel/supplier_viewmodel.dart';
+import 'package:provider/provider.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -41,7 +39,6 @@ void main() async {
     runApp(
       MultiProvider(
         providers: [
-          // Daftarkan SupplierViewModel
           ChangeNotifierProvider(create: (_) => SupplierViewModel()),
         ],
         child: const MyApp(),
