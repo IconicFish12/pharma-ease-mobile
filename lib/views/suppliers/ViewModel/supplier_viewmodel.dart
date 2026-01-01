@@ -22,7 +22,7 @@ class SupplierViewModel extends ChangeNotifier {
       print("[VM] Memanggil Service..."); 
       _suppliers = await _service.getSuppliers();
       print("[VM] SUCCESS => mendapatkan ${_suppliers.length} data");
-      print("[VM] DATA => ${_suppliers}");
+      print("[VM] DATA => $_suppliers");
     
     } catch (e) {
       print("[VM] ERROR => $e"); 

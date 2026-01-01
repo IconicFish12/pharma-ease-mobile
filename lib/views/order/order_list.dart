@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_course_fp/config/config.dart';
 import 'package:mobile_course_fp/views/order/order_detail.dart';
 import 'package:mobile_course_fp/views/order/order_model.dart';
-import 'package:mobile_course_fp/views/suppliers/View/supplier_list.dart';
 import 'dart:math';
 import 'package:mobile_course_fp/views/suppliers/Model/suppliers_model.dart';
 

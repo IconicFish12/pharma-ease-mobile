@@ -1,10 +1,10 @@
 
-const String baseUrl = "http://10.0.2.2:8000/api/admin"; 
+const String baseUrl = "http://10.0.2.2:8000/api"; 
 
 enum Endpoints {
 
-  medicineList('/medicine'),     
-  supplierList('/suppliers'),
+  medicineList('/admin/medicine'),     
+  supplierList('/admin/suppliers'),
   login('/login');      
 
 

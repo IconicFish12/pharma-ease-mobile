@@ -20,7 +20,6 @@ class Provider<T> extends ChangeNotifier {
   T? _selectedData;
   T? get selectedData => _selectedData;
 
-  // --- HELPER METHODS ---
   void _setLoading() {
     _state = ViewState.loading;
     _errorMessage = null;
@@ -66,7 +65,7 @@ class Provider<T> extends ChangeNotifier {
     );
   }
 
-  // CREATE (Return bool agar UI tahu sukses/gagal untuk navigasi/snackbar)
+  // CREATE
   Future<bool> addData(T data) async {
     _setLoading();
     final result = await repository.create(data);

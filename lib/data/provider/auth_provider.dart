@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_course_fp/data/model/auth_model.dart';
 import 'package:mobile_course_fp/data/repository/auth_repository.dart';
+import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
 enum ViewState { initial, loading, success, error }
 
 class AuthProvider extends ChangeNotifier{
   final AuthRepository authRepository;
+  final TokenService tokenService;
 
-  AuthProvider(this.authRepository);
+  AuthProvider(this.authRepository, this.tokenService);
 
   ViewState _state = ViewState.initial;
   ViewState get state => _state;
-
+  
+  User? _currentUser;
+  User? get currentUser => _currentUser;
+  
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  User? _currentUser;
-  User? get currentUser => _currentUser;
-
-  String? _token;
-  String? get token => _token;
+  Future<void> checkLoginStatus() async {
+    final token = await tokenService.getToken();
+    if (token != null) {
+      _state = ViewState.success;
+    } else {
+      _state = ViewState.initial;
+    }
+    notifyListeners();
+  }
 
   Future<bool> login(String email, String password) async {
     _state = ViewState.loading;
@@ -37,7 +46,6 @@ class AuthProvider extends ChangeNotifier{
       (authModel) {
         _state = ViewState.success;
         _currentUser = authModel.user;
-        _token = authModel.token;
         notifyListeners();
         return true;
       },
@@ -45,25 +53,14 @@ class AuthProvider extends ChangeNotifier{
   }
 
   Future<bool> logout() async {
-    if (_token == null) {
-      _errorMessage = "User is not logged in.";
-      return false;
-    }
+    _state = ViewState.loading;
+    notifyListeners();
 
-    final result = await authRepository.logout(_token!);
-
-    return result.fold(
-      (failure) {
-        _errorMessage = failure.message;
-        return false;
-      },
-      (_) {
-        _currentUser = null;
-        _token = null;
-        _state = ViewState.initial;
-        notifyListeners();
-        return true;
-      },
-    );
+    await authRepository.logout();
+    
+    _currentUser = null;
+    _state = ViewState.initial;
+    notifyListeners();
+    return true;
   }
 }

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_course_fp/config/config.dart';
+import 'package:mobile_course_fp/data/provider/auth_provider.dart';
+import 'package:mobile_course_fp/data/repository/auth_repository.dart';
+import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 import 'package:mobile_course_fp/firebase_options.dart';
 import 'package:mobile_course_fp/views/activity_log.dart';
 import 'package:mobile_course_fp/views/auth/forgot_password.dart';
@@ -21,6 +24,7 @@ import 'package:mobile_course_fp/views/order/order_model.dart';
 import 'package:mobile_course_fp/views/reports/financial_report.dart';
 import 'package:mobile_course_fp/views/reports/medicine_report.dart';
 import 'package:mobile_course_fp/views/reports/reports.dart';
+import 'package:mobile_course_fp/views/splash_screen.dart';
 import 'package:mobile_course_fp/views/suppliers/View/supplier_list.dart';
 import 'package:mobile_course_fp/views/users/profile_page.dart';
 import 'package:mobile_course_fp/views/users/user_management_page.dart';
@@ -35,11 +39,15 @@ void main() async {
     name: 'pharma-ease',
   );
 
+  final tokenService = TokenService(); 
+  final authRepository = AuthRepository(tokenService);
+ 
   initializeDateFormatting('id_ID', '').then((_) {
     runApp(
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => SupplierViewModel()),
+          ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
         ],
         child: const MyApp(),
       ),
@@ -57,7 +65,7 @@ class MyApp extends StatelessWidget {
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const SupplierList()),
+        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
         GoRoute(
           name: 'Login',
           path: '/login',
