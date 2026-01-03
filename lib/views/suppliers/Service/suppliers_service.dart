@@ -24,7 +24,7 @@ class SupplierService {
         final SupplierModel apiResponse = supplierModelFromMap(response.body);
         final List<Datum>? rawData = apiResponse.data;
         if (rawData == null) return [];
-        return rawData.map((datum) => datum.toDomain()).toList();
+        return rawData.map((datum) => datum.datumToSupplier()).toList();
       } else {
         print("Error Body: ${response.body}"); 
         throw Exception('Gagal: ${response.statusCode}');

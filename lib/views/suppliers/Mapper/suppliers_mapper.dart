@@ -3,7 +3,7 @@ import '../Model/suppliers_model.dart';
 
 extension DatumToDomain on Datum {
   
-  Supplier toDomain() {
+  Supplier datumToSupplier() {
     return Supplier(
       // Mapping dari Datum (API) ke Supplier (UI)
       id: this.id ?? "0", 

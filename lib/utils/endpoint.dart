@@ -4,9 +4,10 @@ const String baseUrl = "http://10.0.2.2:8000/api/admin";
 enum Endpoints {
 
   medicineList('/medicine'),     
+  medicineCategory('/medicine-category'),
   supplierList('/suppliers'),
-  login('/login');      
-
+  login('/login'),
+  users('users');
 
   final String path;
   const Endpoints(this.path);
@@ -18,7 +19,6 @@ enum Endpoints {
   }
   // delete, edit
   String urlWithId(int id) {
-    
     return "$baseUrl$path$id";
   }
 }
