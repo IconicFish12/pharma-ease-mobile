@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../config/config.dart';
 import './medicines_model.dart';
-import 'package:mobile_course_fp/views/medicine/medicine_category.dart';
+import 'package:mobile_course_fp/views/medicine/medicine-category/View/medicine_category.dart';
 import 'package:mobile_course_fp/views/medicine/medicine_detail.dart';
+import 'package:mobile_course_fp/views/medicine/medicine-category/Model/medicine_category_model.dart';
+import 'package:mobile_course_fp/views/medicine/medicine-category/ViewModel/medicine_category_viewmodel.dart';import 'package:provider/provider.dart';
 
 class MedicineList extends StatefulWidget {
   const MedicineList({super.key});
@@ -107,36 +109,42 @@ class _MedicineListState extends State<MedicineList> {
     ),
   ];
 
-  final List<Category> _categories = [
-    Category(
-      id: 'CAT001',
-      name: 'Pain Relief',
-      icon: Icons.medication_outlined,
-    ),
-    Category(id: 'CAT002', name: 'Antibiotic', icon: Icons.bug_report_outlined),
-    Category(id: 'CAT003', name: 'Antacid', icon: Icons.sick),
-    Category(id: 'CAT004', name: 'Diabetes', icon: Icons.bloodtype_outlined),
-    Category(
-      id: 'CAT005',
-      name: 'Blood Thinner',
-      icon: Icons.colorize_outlined,
-    ),
-    Category(id: 'CAT006', name: 'Antihistamine', icon: Icons.sick_outlined),
-    Category(
-      id: 'CAT007',
-      name: 'Blood Pressure',
-      icon: Icons.monitor_heart_outlined,
-    ),
-    Category(
-      id: 'CAT008',
-      name: 'Cholesterol',
-      icon: Icons.monitor_weight_outlined,
-    ),
-  ];
+  // final List<Category> _categories = [
+  //   Category(
+  //     id: 'CAT001',
+  //     name: 'Pain Relief',
+  //     icon: Icons.medication_outlined,
+  //   ),
+  //   Category(id: 'CAT002', name: 'Antibiotic', icon: Icons.bug_report_outlined),
+  //   Category(id: 'CAT003', name: 'Antacid', icon: Icons.sick),
+  //   Category(id: 'CAT004', name: 'Diabetes', icon: Icons.bloodtype_outlined),
+  //   Category(
+  //     id: 'CAT005',
+  //     name: 'Blood Thinner',
+  //     icon: Icons.colorize_outlined,
+  //   ),
+  //   Category(id: 'CAT006', name: 'Antihistamine', icon: Icons.sick_outlined),
+  //   Category(
+  //     id: 'CAT007',
+  //     name: 'Blood Pressure',
+  //     icon: Icons.monitor_heart_outlined,
+  //   ),
+  //   Category(
+  //     id: 'CAT008',
+  //     name: 'Cholesterol',
+  //     icon: Icons.monitor_weight_outlined,
+  //   ),
+  // ];
 
+    void _getAllSupplier() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MedicineCategoryViewmodel>(context, listen: false).fetchAllCategories();
+    });
+  }
   @override
   void initState() {
     super.initState();
+    _getAllSupplier();
     for (var med in _medicines) {
       med.updateStatus();
     }
@@ -297,52 +305,59 @@ class _MedicineListState extends State<MedicineList> {
     );
   }
 
-  Widget _buildCategoriesSection(BuildContext context) {
+Widget _buildCategoriesSection(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<MedicineCategoryViewmodel>(
+      builder: (context, viewmodel, child) {
+        if (viewmodel.isLoading) {
+          return const Center(child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: CircularProgressIndicator(),
+          ));
+        }
+        
+        if (viewmodel.categories.isEmpty) {
+           return const SizedBox(); 
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Categories', style: textTheme.titleLarge),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        MedicineCategories(categories: _categories),
-                  ),
-                );
-              },
-              child: Text(
-                'See All',
-                style: textTheme.labelLarge?.copyWith(
-                  color: Config.primaryGreen,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Categories', style: textTheme.titleLarge),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MedicineCategories(categories: viewmodel.categories),
+                      ),
+                    );
+                  },
+                  child: Text('See All', style: textTheme.labelLarge?.copyWith(color: Config.primaryGreen)),
                 ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: viewmodel.categories.length > 5 ? 5 : viewmodel.categories.length,
+                itemBuilder: (context, index) {
+                  final category = viewmodel.categories[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: CategoryIconCard(category: category),
+                  );
+                },
               ),
             ),
           ],
-        ),
-        SizedBox(height: 12),
-        SizedBox(
-          height: 100, // Tinggi tetap untuk daftar kategori horizontal
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _categories.length > 5
-                ? 5
-                : _categories.length, // Tampilkan maks 5
-            itemBuilder: (context, index) {
-              final category = _categories[index];
-              return Padding(
-                padding: const EdgeInsets.only(right: 12.0),
-                child: CategoryIconCard(category: category),
-              );
-            },
-          ),
-        ),
-      ],
+        );
+      }
     );
   }
 }
@@ -442,9 +457,7 @@ class CategoryIconCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return InkWell(
       onTap: () {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Filtered by ${category.name}')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Filtered by ${category.name}')));
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -459,14 +472,8 @@ class CategoryIconCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(category.icon, size: 28, color: Config.primaryGreen),
-            SizedBox(height: 6),
-            Text(
-              category.name,
-              style: textTheme.labelSmall,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+            const SizedBox(height: 6),
+            Text(category.name, style: textTheme.labelSmall, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),
