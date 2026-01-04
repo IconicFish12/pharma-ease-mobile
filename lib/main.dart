@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_course_fp/config/config.dart';
+import 'package:mobile_course_fp/data/provider/activity_log_provider.dart';
+import 'package:mobile_course_fp/data/provider/auth_provider.dart';
+import 'package:mobile_course_fp/data/repository/activity_log_repository.dart';
+import 'package:mobile_course_fp/data/repository/auth_repository.dart';
+import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 import 'package:mobile_course_fp/firebase_options.dart';
-import 'package:mobile_course_fp/views/activity_log.dart';
+import 'package:mobile_course_fp/views/activity-log/activity_log.dart';
 import 'package:mobile_course_fp/views/auth/forgot_password.dart';
 import 'package:mobile_course_fp/views/auth/login.dart';
 import 'package:mobile_course_fp/views/auth/send_email.dart';
@@ -38,9 +43,20 @@ void main() async {
   
   print("DEBUG: Mulai inisialisasi Firebase..."); // Debugging 1
 
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
+  final tokenService = TokenService(); 
+  final authRepository = AuthRepository(tokenService);
+  final activityLogRepo = ActivityLogRepository(tokenService);
+ 
+  initializeDateFormatting('id_ID', '').then((_) {
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => SupplierViewModel()),
+          ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
+          ChangeNotifierProvider(create: (_) => ActivityLogProvider(activityLogRepo))
+        ],
+        child: const MyApp(),
+      ),
     );
     print("DEBUG: Firebase Berhasil Connect!"); 
 
@@ -75,7 +91,7 @@ class MyApp extends StatelessWidget {
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const HomePage()),
+        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
         GoRoute(
           name: 'Login',
           path: '/login',

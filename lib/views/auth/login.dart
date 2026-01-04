@@ -71,7 +71,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Mengambil tema teks dari Config (via context)
     final textTheme = Theme.of(context).textTheme;
 
     final isLoading = context.select<AuthProvider, bool>(

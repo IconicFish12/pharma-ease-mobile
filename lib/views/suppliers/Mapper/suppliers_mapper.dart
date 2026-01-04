@@ -6,14 +6,14 @@ extension DatumToDomain on Datum {
   Supplier datumToSupplier() {
     return Supplier(
       // Mapping dari Datum (API) ke Supplier (UI)
-      id: this.id ?? "0", 
-      suppliersName: this.supplierName ?? "Unknown", 
-      contactPerson: this.contactPerson ?? "-",      
-      phoneNumber: this.phone?.toString() ?? "-",
-      address: this.address ?? "-",
+      id: id ?? "0", 
+      suppliersName: supplierName ?? "Unknown", 
+      contactPerson: contactPerson ?? "-",      
+      phoneNumber: phone?.toString() ?? "-",
+      address: address ?? "-",
       medicineQuantity: 0, 
       email: "-", 
-      whatsappNumber: this.phone?.toString() ?? "-", 
+      whatsappNumber: phone?.toString() ?? "-", 
       status: SupplierStatus.active, 
     );
   }

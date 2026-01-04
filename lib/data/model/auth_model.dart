@@ -58,7 +58,7 @@ class User {
     @JsonKey(name: "email")
     final String email;
     @JsonKey(name: "email_verified_at")
-    final DateTime emailVerifiedAt;
+    final DateTime? emailVerifiedAt;
     @JsonKey(name: "role")
     final String role;
     @JsonKey(name: "shift")
@@ -68,13 +68,13 @@ class User {
     @JsonKey(name: "alamat")
     final String alamat;
     @JsonKey(name: "profile_avatar")
-    final dynamic profileAvatar;
+    final String? profileAvatar; 
     @JsonKey(name: "salary")
     final int salary;
     @JsonKey(name: "start_date")
     final DateTime startDate;
     @JsonKey(name: "last_login_at")
-    final dynamic lastLoginAt;
+    final DateTime? lastLoginAt;   
     @JsonKey(name: "created_at")
     final DateTime createdAt;
     @JsonKey(name: "updated_at")
@@ -85,15 +85,15 @@ class User {
         required this.name,
         required this.empId,
         required this.email,
-        required this.emailVerifiedAt,
+        this.emailVerifiedAt,
         required this.role,
         required this.shift,
         required this.dateOfBirth,
         required this.alamat,
-        required this.profileAvatar,
+        this.profileAvatar,
         required this.salary,
         required this.startDate,
-        required this.lastLoginAt,
+        this.lastLoginAt,
         required this.createdAt,
         required this.updatedAt,
     });
