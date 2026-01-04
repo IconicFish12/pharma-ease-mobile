@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_course_fp/config/config.dart';
+import 'package:mobile_course_fp/data/provider/activity_log_provider.dart';
 import 'package:mobile_course_fp/data/provider/auth_provider.dart';
+import 'package:mobile_course_fp/data/repository/activity_log_repository.dart';
 import 'package:mobile_course_fp/data/repository/auth_repository.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 import 'package:mobile_course_fp/firebase_options.dart';
@@ -41,6 +43,7 @@ void main() async {
 
   final tokenService = TokenService(); 
   final authRepository = AuthRepository(tokenService);
+  final activityLogRepo = ActivityLogRepository(tokenService);
  
   initializeDateFormatting('id_ID', '').then((_) {
     runApp(
@@ -48,6 +51,7 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => SupplierViewModel()),
           ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
+          ChangeNotifierProvider(create: (_) => ActivityLogProvider(activityLogRepo))
         ],
         child: const MyApp(),
       ),
