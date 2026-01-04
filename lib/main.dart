@@ -7,7 +7,7 @@ import 'package:mobile_course_fp/data/provider/auth_provider.dart';
 import 'package:mobile_course_fp/data/repository/auth_repository.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 import 'package:mobile_course_fp/firebase_options.dart';
-import 'package:mobile_course_fp/views/activity_log.dart';
+import 'package:mobile_course_fp/views/activity-log/activity_log.dart';
 import 'package:mobile_course_fp/views/auth/forgot_password.dart';
 import 'package:mobile_course_fp/views/auth/login.dart';
 import 'package:mobile_course_fp/views/auth/send_email.dart';

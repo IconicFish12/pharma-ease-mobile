@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../config/config.dart';
+import '../../config/config.dart';
 import 'activityHelper.dart';
 import 'package:intl/intl.dart';
 
