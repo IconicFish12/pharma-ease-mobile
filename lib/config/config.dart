@@ -14,7 +14,8 @@ class Config {
 
   static final Dio dio = Dio();
 
-  static const String baseURL = "https://unforgettable-anjanette-longshore.ngrok-free.dev/api";
+  //static const String baseURL = "https://unforgettable-anjanette-longshore.ngrok-free.dev/api";
+  static const String baseURL = "http://192.168.0.100:8000/api";
 
   ThemeData getAppTheme() {
     return ThemeData(
