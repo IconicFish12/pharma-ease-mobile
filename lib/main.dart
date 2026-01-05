@@ -42,20 +42,17 @@ import 'package:mobile_course_fp/views/medicine/medicine-category/ViewModel/medi
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Inisialisasi Service & Repository
   final tokenService = TokenService();
   final authRepository = AuthRepository(tokenService);
 
   try {
     print("DEBUG: Mulai inisialisasi Firebase...");
-    // Pastikan file firebase_options.dart sudah digenerate via FlutterFire CLI
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform, 
     );
     print("DEBUG: Firebase Berhasil Connect!");
   } catch (e) {
     print("DEBUG: Error Firebase => $e");
-    // Opsional: Handle error jika firebase gagal (misal tetap jalan tapi fitur terbatas)
   }
 
   print("DEBUG: Mulai inisialisasi Date Formatting...");
@@ -63,15 +60,12 @@ void main() async {
 
   print("DEBUG: Menjalankan runApp...");
 
-  // 2. Gabungkan SEMUA Provider di sini (Satu runApp saja)
   runApp(
     MultiProvider(
       providers: [
-        // ViewModel / State Management
         ChangeNotifierProvider(create: (_) => SupplierViewModel()),
         ChangeNotifierProvider(create: (_) => MedicineCategoryViewmodel()),
         
-        // Auth & Logic Providers
         ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
         ChangeNotifierProvider(create: (_) => ActivityLogProvider()),
       ],
