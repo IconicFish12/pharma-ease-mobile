@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_course_fp/config/config.dart';
+import 'package:mobile_course_fp/data/model/medicine_model.dart';
 import 'package:mobile_course_fp/data/provider/activity_log_provider.dart';
 import 'package:mobile_course_fp/data/provider/auth_provider.dart';
 import 'package:mobile_course_fp/data/provider/medicine_category_provider.dart';
@@ -27,7 +28,8 @@ import 'package:mobile_course_fp/views/cashier/cashier_model.dart';
 import 'package:mobile_course_fp/views/cashier/receipt.dart';
 import 'package:mobile_course_fp/views/cashier/transaction_detail.dart';
 import 'package:mobile_course_fp/views/cashier/transaction_summary.dart';
-import 'package:mobile_course_fp/views/home.dart';
+import 'package:mobile_course_fp/views/reports/home.dart';
+import 'package:mobile_course_fp/views/medicine/medicine_detail.dart';
 import 'package:mobile_course_fp/views/medicine/medicine_list.dart';
 import 'package:mobile_course_fp/views/notifications.dart';
 import 'package:mobile_course_fp/views/order/order_detail.dart';
@@ -118,6 +120,14 @@ class MyApp extends StatelessWidget {
           name: 'MedicineInventory',
           path: '/inventory',
           builder: (context, state) => const MedicineList(),
+        ),
+        GoRoute(
+          name: 'MedicineDetail',
+          path: '/medicine-detail',
+          builder: (context, state) {
+            final med = state.extra as Datum;
+            return MedicineDetail(medicine: med);
+          },
         ),
         GoRoute(
           name: 'MedicineSupplier',
