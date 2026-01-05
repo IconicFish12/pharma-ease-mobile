@@ -1,17 +1,15 @@
 import 'dart:convert';
-import 'package:dio/dio.dart'; // Pastikan import Dio
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import '../../config/config.dart'; // Pastikan path ke Config benar
+import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../config/config.dart';
 import '../../data/model/activity_log_model.dart';
 
 enum ViewState { initial, loading, success, error, loadingMore }
 
 class ActivityLogProvider extends ChangeNotifier {
-  // Kita HAPUS dependency ke Repository biar tidak ribet
-  // final ActivityLogRepository _repository; 
-  
-  // Constructor jadi kosong
-  ActivityLogProvider(); // Hapus parameter repository di main.dart nanti
+  ActivityLogProvider(); 
 
   ViewState _state = ViewState.initial;
   ViewState get state => _state;
@@ -25,6 +23,21 @@ class ActivityLogProvider extends ChangeNotifier {
   int _currentPage = 1;
   bool _hasReachedMax = false;
   
+  Future<Options> _getHeaders() async {
+    const storage = FlutterSecureStorage();
+    
+    final token = await storage.read(key: 'auth_token') ?? ''; 
+
+    return Options(
+      headers: {
+        "Authorization": "Bearer $token", 
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      validateStatus: (status) => true, 
+    );
+  }
+
   // --- Actions ---
   Future<void> fetchLogs({Map<String, dynamic>? params}) async {
     _state = ViewState.loading;
@@ -34,27 +47,19 @@ class ActivityLogProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 1. PANGGIL API LANGSUNG (BYPASS REPOSITORY)
+      final options = await _getHeaders(); 
+
       final response = await Config.dio.get(
         "${Config.baseURL}/admin/activity-log",
         queryParameters: {'page': _currentPage, ...?params},
-        options: Options(
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-          },
-          validateStatus: (status) => true, // Biar gak error kalau status != 200
-        ),
+        options: options, 
       );
 
-      // 2. CEK STATUS
       if (response.statusCode == 200) {
-        // 3. PARSING DATA (Handle jika Dio return String atau Map)
         final dynamic responseData = response.data;
         final Map<String, dynamic> jsonMap = 
             (responseData is String) ? jsonDecode(responseData) : responseData;
 
-        // Masukkan ke Model Manual yang baru
         final model = ActivityLogModel.fromJson(jsonMap);
         final listData = model.data?.data ?? [];
 
@@ -64,16 +69,16 @@ class ActivityLogProvider extends ChangeNotifier {
         if (listData.isEmpty) {
           _hasReachedMax = true;
         }
+      } else if (response.statusCode == 401) {
+        _state = ViewState.error;
+        _errorMessage = "Sesi habis (401). Silakan Login ulang.";
       } else {
-        // Jika server menolak (404, 500, dll)
         _state = ViewState.error;
         _errorMessage = "Server Error: ${response.statusCode}";
       }
     } catch (e) {
-      // Jika error kodingan/koneksi
       _state = ViewState.error;
       _errorMessage = "App Error: $e"; 
-      print("DEBUG ERROR: $e"); // Cek ini di terminal kalau masih error
     }
     
     notifyListeners();
@@ -88,10 +93,12 @@ class ActivityLogProvider extends ChangeNotifier {
     _currentPage++;
 
     try {
+      final options = await _getHeaders();
+      
       final response = await Config.dio.get(
         "${Config.baseURL}/admin/activity-log",
         queryParameters: {'page': _currentPage},
-        options: Options(headers: {"Accept": "application/json"}),
+        options: options,
       );
 
       if (response.statusCode == 200) {
@@ -111,7 +118,7 @@ class ActivityLogProvider extends ChangeNotifier {
         _state = ViewState.success;
       } else {
         _currentPage--;
-        _state = ViewState.success; // Fail silent saat load more
+        _state = ViewState.success; 
       }
     } catch (e) {
       _currentPage--;

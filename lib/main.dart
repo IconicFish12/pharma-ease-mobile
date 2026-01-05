@@ -45,7 +45,6 @@ void main() async {
   // 1. Inisialisasi Service & Repository
   final tokenService = TokenService();
   final authRepository = AuthRepository(tokenService);
-  final activityLogRepo = ActivityLogRepository(tokenService);
 
   try {
     print("DEBUG: Mulai inisialisasi Firebase...");
@@ -74,7 +73,7 @@ void main() async {
         
         // Auth & Logic Providers
         ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
-        ChangeNotifierProvider(create: (_) => ActivityLogProvider())
+        ChangeNotifierProvider(create: (_) => ActivityLogProvider()),
       ],
       child: const MyApp(),
     ),
