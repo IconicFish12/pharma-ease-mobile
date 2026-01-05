@@ -1,16 +1,21 @@
 import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:mobile_course_fp/config/config.dart';
 import 'package:mobile_course_fp/data/model/medicine_category_model.dart';
 import 'package:mobile_course_fp/data/repository/repository.dart';
+import 'package:mobile_course_fp/data/repository/service/dio_client.dart';
+import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
 class MedicineCategoryRepository implements Repository<Datum> {
   static String endpoint = 'http://localhost:8000/api/admin/medicine-category'; 
+  final TokenService tokenService;
+  final Dio _dio;
+
+  MedicineCategoryRepository(this.tokenService) : _dio = DioClient(tokenService).dio;
 
   @override
   Future<Either<Failure, List<Datum>>> getMany({Map<String, dynamic>? queryParams}) async {
     try {
-      final api = await Config.dio.get(endpoint, queryParameters: queryParams);
+      final api = await _dio.get(endpoint, queryParameters: queryParams);
 
       if (api.statusCode == 200) {
         final wrapper = MedicineCategoryModel.fromJson(api.data);
@@ -31,7 +36,7 @@ class MedicineCategoryRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> getOne(dynamic id) async {
     try {
-      final response = await Config.dio.get('$endpoint/$id');
+      final response = await _dio.get('$endpoint/$id');
 
       if (response.statusCode == 200) {
         final wrapper = MedicineCategoryModel.fromJson(response.data);
@@ -50,7 +55,7 @@ class MedicineCategoryRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> create(Datum data) async {
     try {
-      final response = await Config.dio.post(endpoint, data: data.toJson());
+      final response = await _dio.post(endpoint, data: data.toJson());
 
       if (response.statusCode == 201 || response.statusCode == 200) {
 
@@ -69,7 +74,7 @@ class MedicineCategoryRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> update(dynamic id, Datum data) async {
     try {
-      final response = await Config.dio.put('$endpoint/$id', data: data.toJson());
+      final response = await _dio.put('$endpoint/$id', data: data.toJson());
       
       if (response.statusCode == 200) {
          final wrapper = MedicineCategoryModel.fromJson(response.data);
@@ -84,7 +89,7 @@ class MedicineCategoryRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, bool>> delete(dynamic id) async {
     try {
-      final response = await Config.dio.delete('$endpoint/$id');
+      final response = await _dio.delete('$endpoint/$id');
       if (response.statusCode == 200) {
         return const Right(true);
       }

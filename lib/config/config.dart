@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,10 +11,9 @@ class Config {
   static const Color errorRed = Color(0xFFD32F2F);
   static const Color successGreen = Color(0xFF388E3C);
 
-  static final Dio dio = Dio();
-
-  //static const String baseURL = "https://unforgettable-anjanette-longshore.ngrok-free.dev/api";
-  static const String baseURL = "https://unuseful-odell-subincomplete.ngrok-free.dev/api";
+  static const String baseURLIbnu = "https://unforgettable-anjanette-longshore.ngrok-free.dev/api";
+  // static const String baseURLApril = "https://unuseful-odell-subincomplete.ngrok-free.dev/api";
+  // static const String baseURLRakha = "https://unuseful-odell-subincomplete.ngrok-free.dev/api";
 
   ThemeData getAppTheme() {
     return ThemeData(

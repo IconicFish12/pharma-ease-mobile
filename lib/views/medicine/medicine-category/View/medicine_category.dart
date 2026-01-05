@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../config/config.dart';
-import '../../medicines_model.dart';
 import 'package:mobile_course_fp/views/medicine/medicine-category/Model/medicine_category_model.dart';
 
 

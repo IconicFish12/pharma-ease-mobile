@@ -5,7 +5,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_course_fp/config/config.dart';
 import 'package:mobile_course_fp/data/provider/activity_log_provider.dart';
 import 'package:mobile_course_fp/data/provider/auth_provider.dart';
-import 'package:mobile_course_fp/data/repository/activity_log_repository.dart';
 import 'package:mobile_course_fp/data/repository/auth_repository.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 import 'package:mobile_course_fp/firebase_options.dart';
@@ -19,7 +18,6 @@ import 'package:mobile_course_fp/views/cashier/receipt.dart';
 import 'package:mobile_course_fp/views/cashier/transaction_detail.dart';
 import 'package:mobile_course_fp/views/cashier/transaction_summary.dart';
 import 'package:mobile_course_fp/views/home.dart';
-import 'package:mobile_course_fp/views/medicine/medicine-category/View/medicine_category.dart';
 import 'package:mobile_course_fp/views/medicine/medicine_list.dart';
 import 'package:mobile_course_fp/views/notifications.dart';
 import 'package:mobile_course_fp/views/order/order_detail.dart';
@@ -32,8 +30,6 @@ import 'package:mobile_course_fp/views/splash_screen.dart';
 import 'package:mobile_course_fp/views/suppliers/View/supplier_list.dart';
 import 'package:mobile_course_fp/views/users/profile_page.dart';
 import 'package:mobile_course_fp/views/users/user_management_page.dart';
-import 'package:provider/provider.dart';
-import 'package:mobile_course_fp/views/medicine/medicine-category/View/medicine_category.dart';
 import 'package:provider/provider.dart';
 // import vm
 import 'package:mobile_course_fp/views/suppliers/ViewModel/supplier_viewmodel.dart';
@@ -67,7 +63,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MedicineCategoryViewmodel()),
         
         ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
-        ChangeNotifierProvider(create: (_) => ActivityLogProvider()),
+        ChangeNotifierProvider(create: (_) => ActivityLogProvider(tokenService)),
       ],
       child: const MyApp(),
     ),
