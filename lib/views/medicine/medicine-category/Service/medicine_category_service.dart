@@ -43,8 +43,8 @@ class MedicineCategoryService {
 
 extension JSONToMedicineCategory on Datum {
   Category toDomain() {
-    final String catName = this.categoryName ?? "Unknown";
-    final String catId = this.id != null ? this.id.toString() : "0";
+    final String catName = categoryName ?? "Unknown";
+    final String catId = id != null ? id.toString() : "0";
 
     return Category(
       id: catId,

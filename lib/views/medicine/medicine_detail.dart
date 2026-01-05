@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:mobile_course_fp/views/medicine/medicine_list.dart';
-import '../../config/config.dart';
-import './medicines_model.dart';
+import 'package:mobile_course_fp/config/config.dart';
+import 'package:mobile_course_fp/data/model/medicine_model.dart';
+import 'package:mobile_course_fp/data/provider/medicine_provider.dart';
+import 'package:mobile_course_fp/views/medicine/form/add_edit_medicine_modal.dart';
+import 'package:mobile_course_fp/views/medicine/extension/medicine_ui_extension.dart';
+import 'package:provider/provider.dart';
 
 class MedicineDetail extends StatefulWidget {
-  final Medicine medicine;
-  final Function(Medicine) onUpdate;
-  final Function(String) onDelete;
+  final Datum medicine;
 
-  const MedicineDetail({
-    super.key,
-    required this.medicine,
-    required this.onUpdate,
-    required this.onDelete,
-  });
+  const MedicineDetail({super.key, required this.medicine});
 
   @override
   State<MedicineDetail> createState() => _MedicineDetailState();
 }
 
 class _MedicineDetailState extends State<MedicineDetail> {
-  late Medicine _currentMedicine;
+  // Kita gunakan local state untuk update UI langsung setelah edit tanpa fetch ulang entire list
+  late Datum _currentMedicine;
 
   @override
   void initState() {
@@ -42,32 +38,24 @@ class _MedicineDetailState extends State<MedicineDetail> {
         child: AddEditMedicineModal(
           isEditMode: true,
           medicineToEdit: _currentMedicine,
-          onSave: (updatedMedicine) {
-            setState(() {
-              _currentMedicine = updatedMedicine; // Update state lokal
-            });
-            widget.onUpdate(updatedMedicine); // Panggil callback di parent
-            Navigator.pop(context); // Tutup modal
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Medicine updated successfully!')),
-            );
-          },
         ),
       ),
-    );
+    ).then((_) {
+      context.read<MedicineProvider>().fetchList();
+    });
   }
 
   void _confirmDelete(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Medicine'),
         content: Text(
-          'Are you sure you want to delete ${_currentMedicine.name}? This action cannot be undone.',
+          'Are you sure you want to delete ${_currentMedicine.displayName}?',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               'Cancel',
               style: TextStyle(color: Config.textSecondary),
@@ -75,15 +63,25 @@ class _MedicineDetailState extends State<MedicineDetail> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Config.errorRed),
-            onPressed: () {
-              widget.onDelete(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+
+              final success = await context.read<MedicineProvider>().deleteData(
                 _currentMedicine.id,
-              ); // Panggil callback di parent
-              Navigator.of(context).pop(); // Tutup dialog konfirmasi
-              Navigator.of(context).pop(); // Tutup halaman detail
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Medicine deleted successfully!')),
               );
+
+              if (success && context.mounted) {
+                context.pop(); // Kembali ke list
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Medicine deleted successfully'),
+                  ),
+                );
+              } else if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to delete medicine')),
+                );
+              }
             },
             child: const Text('Delete'),
           ),
@@ -95,10 +93,9 @@ class _MedicineDetailState extends State<MedicineDetail> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(_currentMedicine.name, style: textTheme.titleLarge),
+        title: Text(_currentMedicine.displayName, style: textTheme.titleLarge),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Config.textPrimary),
           onPressed: () => context.pop(),
@@ -107,12 +104,12 @@ class _MedicineDetailState extends State<MedicineDetail> {
           IconButton(
             icon: Icon(Icons.edit_outlined, color: Config.primaryGreen),
             onPressed: () => _showEditMedicineModal(context),
-            tooltip: 'Edit Medicine',
+            tooltip: 'Edit',
           ),
           IconButton(
             icon: Icon(Icons.delete_outline, color: Config.errorRed),
             onPressed: () => _confirmDelete(context),
-            tooltip: 'Delete Medicine',
+            tooltip: 'Delete',
           ),
         ],
       ),
@@ -121,7 +118,7 @@ class _MedicineDetailState extends State<MedicineDetail> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Card utama dengan informasi ringkas
+            // Card Utama
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -134,30 +131,32 @@ class _MedicineDetailState extends State<MedicineDetail> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _currentMedicine.name,
+                      _currentMedicine.displayName,
                       style: textTheme.headlineMedium,
                     ),
-                    SizedBox(height: 8),
-                    Text(_currentMedicine.code, style: textTheme.bodyMedium),
-                    Divider(height: 24),
+                    const SizedBox(height: 8),
+                    Text(
+                      "SKU: ${_currentMedicine.displayCode}",
+                      style: textTheme.bodyMedium,
+                    ),
+                    const Divider(height: 24),
+
                     _buildDetailRow(
                       context,
-                      'Category',
-                      _currentMedicine.category,
-                      Icons.category_outlined,
+                      'Price',
+                      _currentMedicine.price ?? '0',
+                      Icons.attach_money,
                     ),
                     _buildDetailRow(
                       context,
-                      'Quantity',
-                      '${_currentMedicine.quantity} ${_currentMedicine.unit}',
+                      'Stock',
+                      _currentMedicine.stock.toString(),
                       Icons.storage_outlined,
                     ),
                     _buildDetailRow(
                       context,
                       'Expiry Date',
-                      DateFormat(
-                        'dd MMM yyyy',
-                      ).format(_currentMedicine.expiryDate),
+                      _currentMedicine.expiredDate ?? '-',
                       Icons.calendar_today_outlined,
                     ),
                     _buildDetailRow(
@@ -171,11 +170,11 @@ class _MedicineDetailState extends State<MedicineDetail> {
                 ),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-            // Bagian deskripsi (contoh)
+            // Deskripsi (Optional jika ada di model)
             Text('Description', style: textTheme.titleLarge),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -185,37 +184,11 @@ class _MedicineDetailState extends State<MedicineDetail> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  '${_currentMedicine.name} is a ${_currentMedicine.category.toLowerCase()} medicine. It is typically used for [specific uses here]. Always consult a doctor or pharmacist before use.',
+                  'Medicine ${_currentMedicine.displayName} (SKU: ${_currentMedicine.sku}). Ensure to check stock regularly.',
                   style: textTheme.bodyMedium,
                 ),
               ),
             ),
-            SizedBox(height: 24),
-
-            // Tombol aksi di bagian bawah (opsional, sudah ada di AppBar)
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //   children: [
-            //     Expanded(
-            //       child: ElevatedButton.icon(
-            //         onPressed: () => _showEditMedicineModal(context),
-            //         icon: Icon(Icons.edit_outlined),
-            //         label: Text('Edit'),
-            //       ),
-            //     ),
-            //     SizedBox(width: 16),
-            //     Expanded(
-            //       child: ElevatedButton.icon(
-            //         style: ElevatedButton.styleFrom(
-            //           backgroundColor: Config.errorRed,
-            //         ),
-            //         onPressed: () => _confirmDelete(context),
-            //         icon: Icon(Icons.delete_outline),
-            //         label: Text('Delete'),
-            //       ),
-            //     ),
-            //   ],
-            // ),
           ],
         ),
       ),
@@ -236,7 +209,7 @@ class _MedicineDetailState extends State<MedicineDetail> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 20, color: Config.textSecondary),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(flex: 2, child: Text(label, style: textTheme.bodyMedium)),
           Expanded(
             flex: 3,

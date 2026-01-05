@@ -9,7 +9,7 @@ class DioClient {
   DioClient(this._tokenService) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: Config.baseURL,
+        baseUrl: Config.baseURLIbnu,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {

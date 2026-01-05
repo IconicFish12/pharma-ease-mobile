@@ -2,13 +2,18 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile_course_fp/data/repository/service/dio_client.dart';
+import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 import '../../config/config.dart';
 import '../../data/model/activity_log_model.dart';
 
 enum ViewState { initial, loading, success, error, loadingMore }
 
 class ActivityLogProvider extends ChangeNotifier {
-  ActivityLogProvider(); 
+  final TokenService tokenService;
+  final Dio _dio;
+
+  ActivityLogProvider(this.tokenService) : _dio = DioClient(tokenService).dio; 
 
   ViewState _state = ViewState.initial;
   ViewState get state => _state;
@@ -49,8 +54,8 @@ class ActivityLogProvider extends ChangeNotifier {
     try {
       final options = await _getHeaders(); 
 
-      final response = await Config.dio.get(
-        "${Config.baseURL}/admin/activity-log",
+      final response = await _dio.get(
+        "${Config.baseURLIbnu}/admin/activity-log",
         queryParameters: {'page': _currentPage, ...?params},
         options: options, 
       );
@@ -95,8 +100,8 @@ class ActivityLogProvider extends ChangeNotifier {
     try {
       final options = await _getHeaders();
       
-      final response = await Config.dio.get(
-        "${Config.baseURL}/admin/activity-log",
+      final response = await _dio.get(
+        "${Config.baseURLIbnu}/admin/activity-log",
         queryParameters: {'page': _currentPage},
         options: options,
       );

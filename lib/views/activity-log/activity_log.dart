@@ -293,7 +293,7 @@ class _ActivityLogState extends State<ActivityLog> {
                         const Text("Filter by Action", style: TextStyle(fontWeight: FontWeight.w600)),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<String>(
-                          value: selectedAction,
+                          initialValue: selectedAction,
                           items: actions.map((a) => DropdownMenuItem(value: a, child: Text(a))).toList(),
                           onChanged: (v) => setState(() => selectedAction = v!),
                           decoration: _dropdownDecoration(),
@@ -303,7 +303,7 @@ class _ActivityLogState extends State<ActivityLog> {
                         const Text("Filter by Module", style: TextStyle(fontWeight: FontWeight.w600)),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<String>(
-                          value: selectedModule,
+                          initialValue: selectedModule,
                           items: modules.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
                           onChanged: (v) => setState(() => selectedModule = v!),
                           decoration: _dropdownDecoration(),
@@ -349,7 +349,7 @@ class _ActivityLogState extends State<ActivityLog> {
                           ),
                           
                           // Tombol Load More (Optional, jika API support pagination)
-                          if (!provider.logs.isEmpty && provider.state != ViewState.loadingMore)
+                          if (provider.logs.isNotEmpty && provider.state != ViewState.loadingMore)
                              Padding(
                                padding: const EdgeInsets.only(top: 10),
                                child: Center(

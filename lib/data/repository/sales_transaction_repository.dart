@@ -1,34 +1,22 @@
+import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mobile_course_fp/data/repository/repository.dart';
+import 'package:mobile_course_fp/data/repository/service/dio_client.dart';
+import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
-class SalesTransactionRepository implements Repository {
-  @override
-  Future<Either<Failure, List<dynamic>>> getMany({Map<String, dynamic>? queryParams}) {
-    // TODO: implement getMany
-    throw UnimplementedError();
-  }
+class SalesTransactionRepository {
+  final TokenService tokenService;
+  final Dio _dio;
 
-  @override
-  Future<Either<Failure, dynamic>> create(data) {
-    // TODO: implement create
-    throw UnimplementedError();
-  }
+  SalesTransactionRepository(this.tokenService) : _dio = DioClient(tokenService).dio;
 
-  @override
-  Future<Either<Failure, dynamic>> getOne(id) {
-    // TODO: implement getOne
-    throw UnimplementedError();
-  }
+  // Future<Either<Failure, String>> createTransaction() async {
+  //   try {
+  //     // final reponse = _dio.post('');
 
-  @override
-  Future<Either<Failure, dynamic>> update(id, data) {
-    // TODO: implement update
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<Failure, bool>> delete(id) {
-    // TODO: implement delete
-    throw UnimplementedError();
-  }
+  //     return Right('');
+  //   } on DioException catch (e) {
+      
+  //   }
+  // }
 }

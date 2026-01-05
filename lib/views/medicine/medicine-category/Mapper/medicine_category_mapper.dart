@@ -7,7 +7,7 @@ extension JSONToMedicineCategory on Datum {
     final String categoryName = this.categoryName ?? "-";
 
     return Category(
-      id: this.id ?? "0",
+      id: id ?? "0",
       name: categoryName,
       icon: _getIconManual(categoryName),
     );
