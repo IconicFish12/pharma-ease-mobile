@@ -38,43 +38,43 @@ import 'package:provider/provider.dart';
 // import vm
 import 'package:mobile_course_fp/views/suppliers/ViewModel/supplier_viewmodel.dart';
 import 'package:mobile_course_fp/views/medicine/medicine-category/ViewModel/medicine_category_viewmodel.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  print("DEBUG: Mulai inisialisasi Firebase..."); // Debugging 1
 
-  final tokenService = TokenService(); 
+  // 1. Inisialisasi Service & Repository
+  final tokenService = TokenService();
   final authRepository = AuthRepository(tokenService);
   final activityLogRepo = ActivityLogRepository(tokenService);
- 
-  initializeDateFormatting('id_ID', '').then((_) {
-    runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => SupplierViewModel()),
-          ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
-          ChangeNotifierProvider(create: (_) => ActivityLogProvider(activityLogRepo))
-        ],
-        child: const MyApp(),
-      ),
-    );
-    print("DEBUG: Firebase Berhasil Connect!"); 
 
+  try {
+    print("DEBUG: Mulai inisialisasi Firebase...");
+    // Pastikan file firebase_options.dart sudah digenerate via FlutterFire CLI
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform, 
+    );
+    print("DEBUG: Firebase Berhasil Connect!");
   } catch (e) {
-    print("DEBUG: Error Firebase => $e"); 
+    print("DEBUG: Error Firebase => $e");
+    // Opsional: Handle error jika firebase gagal (misal tetap jalan tapi fitur terbatas)
   }
 
-  print("DEBUG: Mulai inisialisasi Date Formatting..."); 
-  
+  print("DEBUG: Mulai inisialisasi Date Formatting...");
   await initializeDateFormatting('id_ID', '');
-  
-  print("DEBUG: Menjalankan runApp..."); 
 
+  print("DEBUG: Menjalankan runApp...");
+
+  // 2. Gabungkan SEMUA Provider di sini (Satu runApp saja)
   runApp(
     MultiProvider(
       providers: [
+        // ViewModel / State Management
         ChangeNotifierProvider(create: (_) => SupplierViewModel()),
         ChangeNotifierProvider(create: (_) => MedicineCategoryViewmodel()),
+        
+        // Auth & Logic Providers
+        ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
+        ChangeNotifierProvider(create: (_) => ActivityLogProvider())
       ],
       child: const MyApp(),
     ),
