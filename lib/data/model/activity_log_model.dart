@@ -120,14 +120,10 @@ class Datum {
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) {
-    // TRICK PINTAR:
-    // Kadang Laravel taruh 'ip', 'user_name', 'role' di luar 'properties'.
-    // Kita paksa masukkan ke dalam 'properties' supaya UI tidak error.
     Map<String, dynamic> propsData = json["properties"] is Map 
         ? Map<String, dynamic>.from(json["properties"]) 
         : {};
 
-    // Cek data di root, kalau ada masukkan ke propsData
     if (json["ip"] != null) propsData["ip"] = json["ip"];
     if (json["user_name"] != null) propsData["user_name"] = json["user_name"];
     if (json["role"] != null) propsData["role"] = json["role"];
@@ -136,7 +132,7 @@ class Datum {
     return Datum(
       id: json["id"],
       logName: json["log_name"],
-      description: json["description"]?.toString(), // Paksa jadi String
+      description: json["description"]?.toString(),
       subjectType: json["subject_type"],
       subjectId: json["subject_id"]?.toString(),
       causerType: json["causer_type"],
@@ -202,7 +198,6 @@ class Properties {
   String? userName;
   String? role;
   String? details;
-  // Kita abaikan 'attributes' dan 'old' yang kompleks agar tidak error
   
   Properties({
     this.ip,
