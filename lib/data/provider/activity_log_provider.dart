@@ -32,6 +32,7 @@ class ActivityLogProvider extends ChangeNotifier {
         "Authorization": "Bearer $token", 
         "Accept": "application/json",
         "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
       },
       validateStatus: (status) => true, 
     );
