@@ -25,39 +25,35 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
 };
 
 Datum _$DatumFromJson(Map<String, dynamic> json) => Datum(
-  id: json['id'] as String?,
+  id: json['user_id'] as String?,
   name: json['name'] as String?,
   empId: json['emp_id'] as String?,
   email: json['email'] as String?,
   role: json['role'] as String?,
   shift: json['shift'] as String?,
   dateOfBirth: json['date_of_birth'] as String?,
-  address: json['address'] as String?,
-  salary: json['salary'] as String?,
+  address: json['alamat'] as String?,
+  salary: json['salary'],
   startDate: json['start_date'] as String?,
   avatar: json['avatar'],
-  createdAt: json['createdAt'] == null
-      ? null
-      : DateTime.parse(json['createdAt'] as String),
-  updatedAt: json['updatedAt'] == null
-      ? null
-      : DateTime.parse(json['updatedAt'] as String),
+  createdAt: json['created_at'] as String?,
+  updatedAt: json['updated_at'] as String?,
 );
 
 Map<String, dynamic> _$DatumToJson(Datum instance) => <String, dynamic>{
-  'id': instance.id,
+  'user_id': instance.id,
   'name': instance.name,
   'emp_id': instance.empId,
   'email': instance.email,
   'role': instance.role,
   'shift': instance.shift,
   'date_of_birth': instance.dateOfBirth,
-  'address': instance.address,
+  'alamat': instance.address,
   'salary': instance.salary,
   'start_date': instance.startDate,
   'avatar': instance.avatar,
-  'createdAt': instance.createdAt?.toIso8601String(),
-  'updatedAt': instance.updatedAt?.toIso8601String(),
+  'created_at': instance.createdAt,
+  'updated_at': instance.updatedAt,
 };
 
 Meta _$MetaFromJson(Map<String, dynamic> json) => Meta(
