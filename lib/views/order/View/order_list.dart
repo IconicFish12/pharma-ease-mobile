@@ -111,8 +111,35 @@ class _OrderListState extends State<OrderList> {
     ),
   ];
 
+  List<Order> _filteredOrders = [];
 
-void showAddNewOrderBottomSheet(BuildContext context) {
+  @override
+  void initState() {
+    super.initState();
+    _filteredOrders = _orders;
+  }
+
+  void _runFilter(String enteredKeyword) {
+    List<Order> results = [];
+    if (enteredKeyword.isEmpty) {
+      results = _orders;
+    } else {
+      // Filter berdasarkan ID Order atau Nama Supplier
+      results = _orders
+          .where((order) =>
+              order.id.toLowerCase().contains(enteredKeyword.toLowerCase()) ||
+              order.suppliersName
+                  .toLowerCase()
+                  .contains(enteredKeyword.toLowerCase()))
+          .toList();
+    }
+
+    setState(() {
+      _filteredOrders = results;
+    });
+  }
+
+  void showAddNewOrderBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -124,12 +151,15 @@ void showAddNewOrderBottomSheet(BuildContext context) {
         child: AddOrderModal(
           onSave: (Order newOrder) {
             setState(() {
-              _orders.add(newOrder); 
+              _orders.add(newOrder); // Tambah ke data asli
+              _filteredOrders = _orders; 
             });
-            Navigator.pop(context); 
-            
+            Navigator.pop(context);
+
             ScaffoldMessenger.of(context).showSnackBar(
-               SnackBar(content: Text('Order berhasil dibuat untuk ${newOrder.suppliersName}')),
+              SnackBar(
+                  content: Text(
+                      'Order berhasil dibuat untuk ${newOrder.suppliersName}')),
             );
           },
         ),
@@ -149,7 +179,6 @@ void showAddNewOrderBottomSheet(BuildContext context) {
           onPressed: () => context.pop(),
         ),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -164,32 +193,40 @@ void showAddNewOrderBottomSheet(BuildContext context) {
             Text("Order List", style: textTheme.headlineMedium),
             const SizedBox(height: 16),
 
-            ..._orders.map((order) {
-              return OrderListItem(
-                order: order,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => OrderDetailPage(order: order),
-                    ),
-                  );
-                },
-              );
-            }),
+            if (_filteredOrders.isEmpty)
+              const Center(child: Text("No orders found"))
+            else
+              ..._filteredOrders.map((order) {
+                return OrderListItem(
+                  order: order,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrderDetailPage(order: order),
+                      ),
+                    );
+                  },
+                );
+              }),
 
             const SizedBox(height: 80),
           ],
         ),
       ),
-
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           showAddNewOrderBottomSheet(context);
         },
         backgroundColor: Config.primaryGreen,
-        label: Text("Add New Order", style: TextStyle(color: Colors.white),),
-        icon: Icon(Icons.trolley, color: Colors.white,),
+        label: Text(
+          "Add New Order",
+          style: TextStyle(color: Colors.white),
+        ),
+        icon: Icon(
+          Icons.trolley,
+          color: Colors.white,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -197,8 +234,9 @@ void showAddNewOrderBottomSheet(BuildContext context) {
 
   Widget _buildSearchBar() {
     return TextField(
+      onChanged: (value) => _runFilter(value),
       decoration: InputDecoration(
-        hintText: "Search orders...",
+        hintText: "Search orders (ID or Supplier)...",
         prefixIcon: Icon(Icons.search),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -568,7 +606,6 @@ class _AddOrderModalState extends State<AddOrderModal> {
                   ],
         
                   const SizedBox(height: 24),
-        
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(

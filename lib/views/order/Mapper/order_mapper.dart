@@ -1,5 +1,4 @@
 import 'package:intl/intl.dart';
-// Sesuaikan path import ini dengan struktur folder kamu
 import '../../../data/model/medicine_order_model.dart'; 
 import '../Model/order_model.dart'; 
 
@@ -7,7 +6,6 @@ extension DatumToDomain on Datum {
   Order toDomain() {
     final DateTime trxDate = transactionDate ?? DateTime.now();
 
-    // Logic +7 hari DIHAPUS
 
     final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
 
@@ -21,7 +19,6 @@ extension DatumToDomain on Datum {
       whatsappNumber: '-', 
       
       orderDate: formatter.format(trxDate),
-      // Assignment expectedDeliveryDate DIHAPUS
       
       status: _mapStatus(statusLabel),
       
@@ -36,10 +33,8 @@ extension DatumToDomain on Datum {
   OrderStatus _mapStatus(String? label) {
     if (label == null) return OrderStatus.pending;
     switch (label.toLowerCase()) {
-      case 'successful': // Handle variasi string API
       case 'completed':
         return OrderStatus.completed;
-      case 'failed':
       case 'cancelled':
         return OrderStatus.cancelled;
       case 'pending':
