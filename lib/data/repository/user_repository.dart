@@ -6,11 +6,27 @@ import 'package:mobile_course_fp/data/repository/service/dio_client.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
 class UserRepository implements Repository<Datum> {
-  static String endpoint = 'http://localhost:8000/api/admin/users';
+  static String endpoint =
+      'https://unuseful-odell-subincomplete.ngrok-free.dev/api/admin/users';
+
   final TokenService tokenService;
   final Dio _dio;
 
-  UserRepository(this.tokenService) : _dio = DioClient(tokenService).dio;
+  UserRepository(this.tokenService) : _dio = DioClient(tokenService).dio {
+    _dio.interceptors.add(
+      LogInterceptor(requestBody: true, responseBody: true, error: true),
+    );
+  }
+
+  Options get _options => Options(
+    headers: {
+      "ngrok-skip-browser-warning": "true",
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+    },
+    followRedirects: false,
+    validateStatus: (status) => status! < 500,
+  );
 
   @override
   Future<Either<Failure, List<Datum>>> getMany({
@@ -20,19 +36,13 @@ class UserRepository implements Repository<Datum> {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParams,
+        options: _options,
       );
-
       if (response.statusCode == 200) {
         final wrapper = UserModel.fromJson(response.data);
-
-        final List<Datum> dataList = wrapper.data ?? [];
-
-        return Right(dataList);
-      } else {
-        return Left(Failure("Server Error: ${response.statusCode}"));
+        return Right(wrapper.data ?? []);
       }
-    } on DioException catch (e) {
-      return Left(Failure(e.message ?? "Terjadi kesalahan koneksi"));
+      return Left(Failure("Server Error: ${response.statusCode}"));
     } catch (e) {
       return Left(Failure(e.toString()));
     }
@@ -41,17 +51,12 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> getOne(dynamic id) async {
     try {
-      final response = await _dio.get('$endpoint/$id');
-
+      final response = await _dio.get('$endpoint/$id', options: _options);
       if (response.statusCode == 200) {
         final wrapper = UserModel.fromJson(response.data);
-        if (wrapper.data != null && wrapper.data!.isNotEmpty) {
-          return Right(wrapper.data!.first);
-        } else {
-          return Left(Failure("Data tidak ditemukan"));
-        }
+        return Right(wrapper.data!.first);
       }
-      return Left(Failure("Server Error"));
+      return Left(Failure("Data not found"));
     } catch (e) {
       return Left(Failure(e.toString()));
     }
@@ -60,16 +65,15 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> create(Datum data) async {
     try {
-      final response = await _dio.post(endpoint, data: data.toJson());
-
+      final response = await _dio.post(
+        endpoint,
+        data: data.toJson(),
+        options: _options,
+      );
       if (response.statusCode == 201 || response.statusCode == 200) {
-        final wrapper = UserModel.fromJson(response.data);
-        if (wrapper.data != null && wrapper.data!.isNotEmpty) {
-          return Right(wrapper.data!.first);
-        }
-        return Left(Failure("Gagal parsing response create"));
+        return Right(data);
       }
-      return Left(Failure("Gagal create data"));
+      return Left(_parseError(response));
     } catch (e) {
       return Left(Failure(e.toString()));
     }
@@ -78,16 +82,20 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> update(dynamic id, Datum data) async {
     try {
-      final response = await _dio.put(
+      final Map<String, dynamic> body = data.toJson();
+
+      body['_method'] = 'PUT';
+
+      final response = await _dio.post(
         '$endpoint/$id',
-        data: data.toJson(),
+        data: body,
+        options: _options,
       );
 
       if (response.statusCode == 200) {
-        final wrapper = UserModel.fromJson(response.data);
-        return Right(wrapper.data!.first);
+        return Right(data);
       }
-      return Left(Failure("Gagal update"));
+      return Left(_parseError(response));
     } catch (e) {
       return Left(Failure(e.toString()));
     }
@@ -96,13 +104,31 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, bool>> delete(dynamic id) async {
     try {
-      final response = await _dio.delete('$endpoint/$id');
-      if (response.statusCode == 200) {
+      final response = await _dio.post(
+        '$endpoint/$id',
+        data: {'_method': 'DELETE'},
+        options: _options,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right(true);
       }
-      return Left(Failure("Gagal delete"));
+      return Left(_parseError(response));
     } catch (e) {
       return Left(Failure(e.toString()));
     }
+  }
+
+  Failure _parseError(Response response) {
+    if (response.statusCode == 422 && response.data != null) {
+      final data = response.data;
+      if (data['message'] != null) return Failure(data['message']);
+    }
+    if (response.statusCode == 404) return Failure("URL Salah (404). Cek ID.");
+    if (response.statusCode == 405)
+      return Failure("Method 405. Cek Route Laravel.");
+    if (response.statusCode == 500)
+      return Failure("Server Error (500). Cek Log Laravel.");
+    return Failure("Error: ${response.statusCode}");
   }
 }

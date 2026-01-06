@@ -55,7 +55,7 @@ void main() async {
   try {
     print("DEBUG: Mulai inisialisasi Firebase...");
     await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform, 
+      options: DefaultFirebaseOptions.currentPlatform,
     );
     print("DEBUG: Firebase Berhasil Connect!");
   } catch (e) {
@@ -72,13 +72,30 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => SupplierViewModel()),
         ChangeNotifierProvider(create: (_) => MedicineCategoryViewmodel()),
-        ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
-        ChangeNotifierProvider(create: (_) => ActivityLogProvider(tokenService)),
-        ChangeNotifierProvider(create: (_) => MedicineProvider(MedicineRepository(tokenService))),
-        ChangeNotifierProvider(create: (_) => MedicineOrderProvider(MedicineOrderRepository(tokenService))),
-        ChangeNotifierProvider(create: (_) => MedicineCategoryProvider(MedicineCategoryRepository(tokenService))),
-        ChangeNotifierProvider(create: (_) => SupplierProvider(SupplierRepository(tokenService))),
-        ChangeNotifierProvider(create: (_) => UserProvider(UserRepository(tokenService))),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(authRepository, tokenService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ActivityLogProvider(tokenService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => MedicineProvider(MedicineRepository(tokenService)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              MedicineOrderProvider(MedicineOrderRepository(tokenService)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => MedicineCategoryProvider(
+            MedicineCategoryRepository(tokenService),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SupplierProvider(SupplierRepository(tokenService)),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => UserProvider(UserRepository(tokenService)),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -89,8 +106,8 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {    
-     final Config config = Config();
+  Widget build(BuildContext context) {
+    final Config config = Config();
     final router = GoRouter(
       restorationScopeId: 'router',
       routerNeglect: true,
@@ -189,10 +206,10 @@ class MyApp extends StatelessWidget {
                 return TransactionDetailPage(cartItems: cartItems ?? []);
               },
             ),
-            
+
             GoRoute(
               name: 'Receipt',
-              path: 'receipt', 
+              path: 'receipt',
               builder: (context, state) {
                 final transaction = state.extra as Transaction;
                 return ReceiptPage(transaction: transaction);
