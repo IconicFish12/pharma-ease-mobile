@@ -57,7 +57,7 @@ class UserProvider extends Provider<Datum> {
   Future<bool> create(Datum data) async {
     isLoading = true;
     notifyListeners();
-    final result = await repository.create(data);
+    final result = await repository.create(data: data);
     return result.fold(
       (failure) {
         errorMessage = failure.message;
@@ -75,7 +75,7 @@ class UserProvider extends Provider<Datum> {
   }
 
   Future<bool> update(dynamic id, Datum data) async {
-    final result = await repository.update(id, data);
+    final result = await repository.update(id, data: data);
 
     return result.fold(
       (failure) {

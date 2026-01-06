@@ -63,7 +63,7 @@ class UserRepository implements Repository<Datum> {
   }
 
   @override
-  Future<Either<Failure, Datum>> create(Datum data) async {
+  Future<Either<Failure, Datum>> create({required dynamic data}) async {
     try {
       final response = await _dio.post(
         endpoint,
@@ -80,7 +80,7 @@ class UserRepository implements Repository<Datum> {
   }
 
   @override
-  Future<Either<Failure, Datum>> update(dynamic id, Datum data) async {
+  Future<Either<Failure, Datum>> update(dynamic id, {required dynamic data}) async {
     try {
       final Map<String, dynamic> body = data.toJson();
 

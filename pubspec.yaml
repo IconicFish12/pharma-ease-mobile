@@ -55,6 +55,7 @@ dependencies:
   fpdart: ^1.2.0
   json_annotation: ^4.9.0
   shared_preferences: ^2.5.4
+  image_picker: ^1.2.1
 
 dev_dependencies:
   flutter_test:

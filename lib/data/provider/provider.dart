@@ -66,9 +66,9 @@ class Provider<T> extends ChangeNotifier {
   }
 
   // CREATE
-  Future<bool> addData(T data) async {
+  Future<bool> addData({required dynamic data}) async {
     _setLoading();
-    final result = await repository.create(data);
+    final result = await repository.create(data: data);
 
     return result.fold(
       (failure) {
@@ -84,9 +84,9 @@ class Provider<T> extends ChangeNotifier {
   }
 
   // UPDATE
-  Future<bool> updateData(dynamic id, T data) async {
+  Future<bool> updateData(dynamic id, {required dynamic data}) async {
     _setLoading();
-    final result = await repository.update(id, data);
+    final result = await repository.update(id, data: data);
 
     return result.fold(
       (failure) {
@@ -117,9 +117,6 @@ class Provider<T> extends ChangeNotifier {
         return false;
       },
       (success) {
-        // Hapus dari list lokal
-        // _listData.removeWhere((item) => item.id == id); // Butuh akses properti id
-        // Karena T generic gak tau punya 'id', kita refresh list saja amannya:
         fetchList(); 
         
         _setSuccess();
