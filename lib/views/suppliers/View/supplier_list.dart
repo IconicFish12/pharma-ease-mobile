@@ -42,7 +42,7 @@ class _SupplierListState extends State<SupplierList> {
     });
   }
 
-  void _showAddSupplierModal(BuildContext context) {
+void _showAddSupplierModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -54,11 +54,7 @@ class _SupplierListState extends State<SupplierList> {
         child: AddEditSupplierModal(
           isEditMode: false,
           onSave: (newSupplier) {
-            // _addSupplier(newSupplier);
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Supplier added successfully!')),
-            );
+            _createNewSupplier(newSupplier);
           },
         ),
       ),
@@ -69,6 +65,37 @@ class _SupplierListState extends State<SupplierList> {
   void initState() {
     _getAllSupplier();
     super.initState();
+  }
+
+Future<void> _createNewSupplier(Supplier supplierData) async {
+    final vm = Provider.of<SupplierViewModel>(context, listen: false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Saving data...'), duration: Duration(milliseconds: 800)),
+    );
+
+    final bool isSuccess = await vm.createNewSupplier(
+      supplierName: supplierData.suppliersName,
+      contactPerson: supplierData.contactPerson,
+      phoneNumber: supplierData.phoneNumber,
+      address: supplierData.address,
+    );
+    if (!mounted) return;
+
+    if (isSuccess) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Supplier added successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(vm.errorMessage), 
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -91,14 +118,13 @@ class _SupplierListState extends State<SupplierList> {
               delegate: SliverChildListDelegate([
                 Text('Supplier Management', style: textTheme.headlineMedium),
                 SizedBox(height: 16),
-                _buildSearchBar(context), // Menggunakan search bar
+                _buildSearchBar(context), 
                 SizedBox(height: 24),
                 Text('Supplier List', style: textTheme.headlineMedium),
                 SizedBox(height: 16),
               ]),
             ),
           ),
-
           // panggil vm
           Consumer<SupplierViewModel>(
             builder: (context, vm, child) {
@@ -161,7 +187,22 @@ class _SupplierListState extends State<SupplierList> {
                             builder: (context) => SuppliersDetail(
                               supplier: supplier,
                               editSupplier: (updatedSupplier) {},
-                              onDelete: (supplierId) {},
+                              onDelete: (supplierId) async {
+                                final vm = Provider.of<SupplierViewModel>(context, listen: false);
+                                bool success = await vm.deleteSupplier(supplierId);
+
+                                if (!success && context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(vm.errorMessage), 
+                                      backgroundColor: Colors.red
+                                    ),
+                                  );
+                                }
+
+                                // 4. Return status sukses/gagal ke halaman Detail
+                                return success;
+                              },
                             ),
                           ),
                         );
@@ -299,7 +340,6 @@ class SupplierListItem extends StatelessWidget {
     );
   }
 }
-
 class AddEditSupplierModal extends StatefulWidget {
   final bool isEditMode;
   final Supplier? supplierToEdit;
@@ -318,14 +358,12 @@ class AddEditSupplierModal extends StatefulWidget {
 
 class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
   final _formKey = GlobalKey<FormState>();
+  
+  // HANYA 4 VARIABEL UTAMA SESUAI POSTMAN
   late String _suppliersName;
   late String _contactPerson;
-  late String _email;
   late String _phoneNumber;
-  late String _whatsappNumber;
   late String _address;
-  late int _medicineQuantity;
-  late SupplierStatus _status;
 
   @override
   void initState() {
@@ -333,39 +371,41 @@ class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
     if (widget.isEditMode && widget.supplierToEdit != null) {
       _suppliersName = widget.supplierToEdit!.suppliersName;
       _contactPerson = widget.supplierToEdit!.contactPerson;
-      _email = widget.supplierToEdit!.email;
       _phoneNumber = widget.supplierToEdit!.phoneNumber;
       _address = widget.supplierToEdit!.address;
-      _medicineQuantity = widget.supplierToEdit!.medicineQuantity;
-      _status = widget.supplierToEdit!.status;
     } else {
       _suppliersName = '';
       _contactPerson = '';
-      _email = '';
       _phoneNumber = '';
-      _whatsappNumber = '';
       _address = '';
-      _medicineQuantity = 0;
-      _status = SupplierStatus.active; // Default 1 year from now
     }
   }
 
   void _saveForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      
+      // KITA BUAT OBJEK SUPPLIER
+      // Karena Model Supplier kamu mungkin masih mewajibkan field email/wa/quantity,
+      // kita isi dengan data dummy ('-' atau 0) agar tidak error codingannya.
+      // Data dummy ini tidak akan dikirim ke server karena ViewModel hanya mengambil 4 field di atas.
+      
       final newsupplier = Supplier(
         id: widget.isEditMode
             ? widget.supplierToEdit!.id
             : UniqueKey().toString(),
         suppliersName: _suppliersName,
         contactPerson: _contactPerson,
-        email: _email,
         phoneNumber: _phoneNumber,
-        whatsappNumber: _whatsappNumber,
         address: _address,
-        medicineQuantity: _medicineQuantity,
-        status: _status,
+        
+        // --- DATA DUMMY (Untuk pelengkap Model saja) ---
+        email: widget.isEditMode ? widget.supplierToEdit!.email : '-', 
+        whatsappNumber: widget.isEditMode ? widget.supplierToEdit!.whatsappNumber : '-',
+        medicineQuantity: widget.isEditMode ? widget.supplierToEdit!.medicineQuantity : 0,
+        status: widget.isEditMode ? widget.supplierToEdit!.status : SupplierStatus.active,
       );
+      
       widget.onSave(newsupplier);
     }
   }
@@ -398,14 +438,14 @@ class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               widget.isEditMode
                   ? 'Update the supplier details below.'
                   : 'Enter the supplier details to add to inventory.',
               style: textTheme.bodyMedium,
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Form(
               key: _formKey,
               child: Column(
@@ -414,119 +454,70 @@ class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
                     initialValue: _suppliersName,
                     decoration: const InputDecoration(
                       labelText: 'Supplier Name',
-                      hintText: 'e.g., John Doe',
+                      hintText: 'e.g., PT Kimia Farma',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter supplier name';
+                        return 'Nama supplier wajib diisi';
                       }
                       return null;
                     },
                     onSaved: (value) => _suppliersName = value!,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
+                  
                   TextFormField(
                     initialValue: _contactPerson,
                     decoration: const InputDecoration(
-                      labelText: 'Supplier Personal Contact',
-                      hintText: 'e.g., John Doe',
+                      labelText: 'Contact Person Name',
+                      hintText: 'e.g., Budi Santoso',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter medicine code';
+                        return 'Kontak person wajib diisi';
                       }
                       return null;
                     },
                     onSaved: (value) => _contactPerson = value!,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
+                  
                   TextFormField(
-                    initialValue: _email,
+                    initialValue: _phoneNumber,
+                    keyboardType: TextInputType.phone,
                     decoration: const InputDecoration(
-                      labelText: 'Supplier Email',
-                      hintText: 'e.g., JohnDoe@gmail.com',
+                      labelText: 'Phone Number',
+                      hintText: 'e.g., 08123456789',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter medicine code';
+                        return 'Nomor telepon wajib diisi';
                       }
                       return null;
                     },
-                    onSaved: (value) => _email = value!,
+                    onSaved: (value) => _phoneNumber = value!,
                   ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: _phoneNumber,
-                          decoration: const InputDecoration(
-                            labelText: 'Supplier Phone Number',
-                            hintText: '+6282233445551',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter Suplier Phone Number';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) => _phoneNumber = value!,
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: _whatsappNumber,
-                          decoration: const InputDecoration(
-                            labelText: 'Contact Person Number',
-                            hintText: '+6282233445551',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter Contact Phone Number';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) => _whatsappNumber = value!,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
+                  
                   TextFormField(
                     keyboardType: TextInputType.multiline,
-                    maxLines: 5,
-                    minLines: 2,
+                    maxLines: 3,
+                    minLines: 1,
                     initialValue: _address,
                     decoration: const InputDecoration(
-                      labelText: 'Supplier Address',
-                      hintText: 'e.g., JohnDoe@gmail.com',
+                      labelText: 'Address',
+                      hintText: 'e.g., Jl. Sudirman No. 10',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter Supplier Address';
+                        return 'Alamat wajib diisi';
                       }
                       return null;
                     },
                     onSaved: (value) => _address = value!,
                   ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    initialValue: _medicineQuantity.toString(),
-                    decoration: const InputDecoration(
-                      labelText: 'Supplier Address',
-                      hintText: 'e.g., JohnDoe@gmail.com',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter Supplier Address';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) => _medicineQuantity = int.parse(value!),
-                  ),
-                  SizedBox(height: 24),
+                  
+                  const SizedBox(height: 24),
                   Row(
                     children: [
                       Expanded(
@@ -540,7 +531,7 @@ class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
@@ -567,6 +558,7 @@ class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
                       ),
                     ],
                   ),
+                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0 ? 0 : 20),
                 ],
               ),
             ),

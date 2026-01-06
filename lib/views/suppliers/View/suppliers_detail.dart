@@ -30,24 +30,40 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
   }
 
   // --- Implementasi Logika Delete ---
-  void _confirmDelete() {
+void _confirmDelete() {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
+      context: context, 
+      builder: (BuildContext dialogContext) { 
         return AlertDialog(
           title: const Text('Hapus Supplier'),
           content: Text('Apakah Anda yakin ingin menghapus ${_currentSupplier.suppliersName}?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext), 
               child: const Text('Batal'),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Config.errorRed),
-              onPressed: () {
-                widget.onDelete(_currentSupplier.id);
-                Navigator.pop(context); // Tutup dialog
-                context.pop(); // Kembali ke list supplier
+              onPressed: () async {
+                Navigator.pop(dialogContext); 
+                if (mounted) {
+                   ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Menghapus data..."), duration: Duration(seconds: 1)),
+                  );
+                }
+
+                bool isSuccess = await widget.onDelete(_currentSupplier.id);
+
+                if (!mounted) return;
+
+                if (isSuccess) {
+                  context.pop(); 
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Berhasil dihapus"), backgroundColor: Colors.green),
+                  );
+                } else {
+                }
               },
               child: const Text('Hapus', style: TextStyle(color: Colors.white)),
             ),
@@ -59,10 +75,7 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
 
   // --- Implementasi Logika Edit ---
   void _handleEdit() async {
-    // Memanggil callback editSupplier yang dikirim dari parent
     final updatedSupplier = await widget.editSupplier(_currentSupplier);
-    
-    // Jika ada data yang kembali (setelah user simpan perubahan)
     if (updatedSupplier != null && mounted) {
       setState(() {
         _currentSupplier = updatedSupplier;

@@ -18,7 +18,7 @@ enum Endpoints {
     return "$baseUrlRakha$path"; 
   }
   // delete, edit
-  String urlWithId(int id) {
-    return "$baseUrlRakha$path$id";
+  String urlWithId(String id) {
+    return "$baseUrlRakha$path/$id";
   }
 }
