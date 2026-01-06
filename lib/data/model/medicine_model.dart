@@ -11,6 +11,11 @@ MedicineModel medicineModelFromMap(String str) => MedicineModel.fromJson(json.de
 
 String medicineModelToMap(MedicineModel data) => json.encode(data.toJson());
 
+String? _stringFromAny(dynamic value) {
+  if (value == null) return null;
+  return value.toString();
+}
+
 @JsonSerializable()
 class MedicineModel {
     @JsonKey(name: "status")
@@ -49,17 +54,17 @@ class MedicineModel {
 
 @JsonSerializable()
 class Datum {
-    @JsonKey(name: "id")
+     @JsonKey(name: "id", fromJson: _stringFromAny) 
     final String? id;
     @JsonKey(name: "medicineName")
     final String? medicineName;
-    @JsonKey(name: "sku")
+    @JsonKey(name: "sku", fromJson: _stringFromAny) // Safe convert
     final String? sku;
     @JsonKey(name: "stock")
     final int? stock;
     @JsonKey(name: "expiredDate")
     final String? expiredDate;
-    @JsonKey(name: "price")
+    @JsonKey(name: "price", fromJson: _stringFromAny) // Safe convert
     final String? price;
     @JsonKey(name: "category")
     final Category? category;
@@ -115,7 +120,7 @@ class Datum {
 
 @JsonSerializable()
 class Category {
-    @JsonKey(name: "id")
+    @JsonKey(name: "id", fromJson: _stringFromAny) // Safe convert
     final String? id;
     @JsonKey(name: "categoryName")
     final String? categoryName;
@@ -151,7 +156,7 @@ class Category {
 
 @JsonSerializable()
 class Suplier {
-    @JsonKey(name: "id")
+    @JsonKey(name: "id", fromJson: _stringFromAny) // Safe convert
     final String? id;
     @JsonKey(name: "supplierName")
     final String? supplierName;

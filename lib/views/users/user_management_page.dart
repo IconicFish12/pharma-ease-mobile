@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_course_fp/data/model/user_model.dart';
 import 'package:mobile_course_fp/data/provider/user_provider.dart';
+import 'package:mobile_course_fp/data/provider/provider.dart';
 
 class UserManagementPage extends StatefulWidget {
   const UserManagementPage({super.key});
@@ -18,8 +20,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UserProvider>().getMany();
+    Future.microtask(() {
+      context.read<UserProvider>().fetchList();
     });
   }
 
@@ -31,13 +33,16 @@ class _UserManagementPageState extends State<UserManagementPage> {
 
   Future<void> _addUser(Datum newUser) async {
     final provider = context.read<UserProvider>();
-    final bool success = await provider.create(newUser);
+    final bool success = await provider.addData(data: newUser);
 
     if (mounted) {
       if (success) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User added successfully')),
+          const SnackBar(
+            content: Text('User added successfully'),
+            backgroundColor: Colors.green,
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -52,13 +57,20 @@ class _UserManagementPageState extends State<UserManagementPage> {
 
   Future<void> _updateUser(Datum updatedUser) async {
     final provider = context.read<UserProvider>();
-    final bool success = await provider.update(updatedUser.id, updatedUser);
+    // Pastikan ID dikirim terpisah dari payload object jika method update repository membutuhkannya
+    final bool success = await provider.updateData(
+      updatedUser.id,
+      data: updatedUser,
+    );
 
     if (mounted) {
       if (success) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User updated successfully')),
+          const SnackBar(
+            content: Text('User updated successfully'),
+            backgroundColor: Colors.green,
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -73,7 +85,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
 
   Future<void> _deleteUser(dynamic userId) async {
     final provider = context.read<UserProvider>();
-    final bool success = await provider.delete(userId);
+    final bool success = await provider.deleteData(userId);
 
     if (mounted) {
       if (success) {
@@ -92,11 +104,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
   }
 
   void _onSearch(String query) {
-    context.read<UserProvider>().getMany(search: query);
-  }
-
-  void _loadMore() {
-    context.read<UserProvider>().getMany(isLoadMore: true);
+    context.read<UserProvider>().fetchList(params: {'search': query});
   }
 
   void _showAddEditUserModal({bool isEditMode = false, Datum? user}) {
@@ -121,81 +129,58 @@ class _UserManagementPageState extends State<UserManagementPage> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final provider = context.watch<UserProvider>();
-    final List<Datum> userList = provider.listData;
-    final bool isLoading = provider.isLoading;
-
+    // Menggunakan Consumer untuk listen perubahan
     return Scaffold(
       appBar: AppBar(
         title: Text('User Management', style: textTheme.titleLarge),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await context.read<UserProvider>().getMany();
+          await context.read<UserProvider>().fetchList();
         },
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
+        child: Column(
+          children: [
+            Padding(
               padding: const EdgeInsets.all(16.0),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
                     'User & Employee Management',
                     style: textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 16),
                   _buildSearchBar(context),
-                  const SizedBox(height: 16),
-                ]),
+                ],
               ),
             ),
-            if (userList.isEmpty && isLoading)
-              const SliverToBoxAdapter(
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (userList.isEmpty)
-              const SliverToBoxAdapter(
-                child: Center(child: Text("No users found")),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    if (index == userList.length) {
-                      if (provider.hasMoreData) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          child: isLoading
-                              ? const Center(child: CircularProgressIndicator())
-                              : ElevatedButton.icon(
-                                  onPressed: _loadMore,
-                                  icon: const Icon(Icons.arrow_downward),
-                                  label: const Text("Load More Users"),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.grey[200],
-                                    foregroundColor: Colors.black,
-                                  ),
-                                ),
-                        );
-                      } else {
-                        return const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Center(child: Text("All users loaded")),
-                        );
-                      }
-                    }
+            Expanded(
+              child: Consumer<UserProvider>(
+                builder: (context, provider, child) {
+                  if (provider.state == ViewState.loading &&
+                      provider.listData.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    final user = userList[index];
-                    return UserListItem(
-                      user: user,
-                      onTap: () =>
-                          _showAddEditUserModal(isEditMode: true, user: user),
-                    );
-                  }, childCount: userList.length + 1),
-                ),
+                  if (provider.listData.isEmpty) {
+                    return const Center(child: Text("No users found"));
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    itemCount: provider.listData.length,
+                    itemBuilder: (context, index) {
+                      final user = provider.listData[index];
+                      return UserListItem(
+                        user: user,
+                        onTap: () =>
+                            _showAddEditUserModal(isEditMode: true, user: user),
+                      );
+                    },
+                  );
+                },
               ),
-            const SliverToBoxAdapter(child: SizedBox(height: 80)),
+            ),
           ],
         ),
       ),
@@ -205,7 +190,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
         label: const Text('Add New User'),
         icon: const Icon(Icons.person_add_alt_1_outlined),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -240,12 +224,12 @@ class UserListItem extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     String lastLoginText = '-';
-    if (user.createdAt != null && user.createdAt!.isNotEmpty) {
+    if (user.createdAt != null) {
       try {
         final DateTime date = DateTime.parse(user.createdAt!);
         lastLoginText = DateFormat('dd MMM yyyy').format(date);
       } catch (e) {
-        lastLoginText = user.createdAt!;
+        lastLoginText = '-';
       }
     }
 
@@ -275,13 +259,31 @@ class UserListItem extends StatelessWidget {
             const SizedBox(height: 4),
             Text(user.email ?? '-', style: textTheme.bodyMedium),
             const SizedBox(height: 4),
-            Text(
-              '${user.role?.toUpperCase()} • ${user.shift?.toUpperCase() ?? '-'}',
-              style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'Joined: $lastLoginText',
-              style: textTheme.bodySmall?.copyWith(color: Colors.grey),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: user.roleColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    user.role?.toUpperCase() ?? '-',
+                    style: textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: user.roleColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '• ${user.shift?.toUpperCase() ?? '-'}',
+                  style: textTheme.bodySmall,
+                ),
+              ],
             ),
           ],
         ),
@@ -311,6 +313,7 @@ class _AddEditUserModal extends StatefulWidget {
 class _AddEditUserModalState extends State<_AddEditUserModal> {
   final _formKey = GlobalKey<FormState>();
 
+  late String _userId;
   late String _fullName;
   late String _email;
   late String _empId;
@@ -328,22 +331,25 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
   bool _obscurePassword = true;
 
   final List<String> _roles = ['admin', 'pharmacist', 'cashier', 'owner'];
-  final List<String> _shifts = ['pagi', 'siang', 'malam'];
+  final List<String> _shifts = ['pagi', 'siang', 'sore'];
 
   @override
   void initState() {
     super.initState();
     if (widget.isEditMode && widget.userToEdit != null) {
       final u = widget.userToEdit!;
+      _userId = u.id ?? '';
       _fullName = u.name ?? '';
       _email = u.email ?? '';
       _empId = u.empId ?? '';
-      _role = u.role ?? 'cashier';
-      _shift = u.shift ?? 'pagi';
+      _role = _roles.contains(u.role) ? u.role! : 'cashier';
+      _shift = _shifts.contains(u.shift) ? u.shift! : 'pagi';
       _salary = u.salary?.toString() ?? '';
+      _address = u.address ?? '';
+
       _dateOfBirth = u.dateOfBirth;
       _startDate = u.startDate;
-      _address = u.address ?? '';
+
       _password = '';
     } else {
       _fullName = '';
@@ -352,11 +358,13 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
       _role = 'cashier';
       _shift = 'pagi';
       _salary = '';
-      _dateOfBirth = null;
-      _startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
       _address = '';
       _password = '';
+
+      _startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     }
+
+    debugPrint("ID : $_userId");
 
     if (_dateOfBirth != null) {
       _dobController.text = _formatDateDisplay(_dateOfBirth!);
@@ -368,15 +376,14 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
 
   String _formatDateDisplay(String yyyyMMdd) {
     try {
-      if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(yyyyMMdd)) {
-        DateTime dt = DateFormat('yyyy-MM-dd').parse(yyyyMMdd);
-        return DateFormat('dd MMM yyyy').format(dt);
-      }
-      return yyyyMMdd;
+      DateTime dt = DateFormat('yyyy-MM-dd').parse(yyyyMMdd);
+      return DateFormat('dd MMM yyyy').format(dt);
     } catch (e) {
       return yyyyMMdd;
     }
   }
+
+  
 
   Future<void> _selectDate(BuildContext context, bool isDob) async {
     final DateTime? picked = await showDatePicker(
@@ -384,6 +391,17 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
       initialDate: DateTime.now(),
       firstDate: DateTime(1950),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.green, // Sesuaikan config
+              onPrimary: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       String formattedForApi = DateFormat('yyyy-MM-dd').format(picked);
@@ -405,6 +423,8 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
+      // Buat object Datum baru
+      
       final user = Datum(
         id: widget.isEditMode ? widget.userToEdit!.id : null,
         name: _fullName,
@@ -412,11 +432,13 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
         empId: _empId,
         role: _role,
         shift: _shift,
-        salary: _salary, 
+        salary: int.tryParse(
+          _salary.replaceAll(RegExp(r'[^0-9]'), ''),
+        ), // Bersihkan format currency jika ada
         address: _address,
         dateOfBirth: _dateOfBirth,
         startDate: _startDate,
-        password: _password.isEmpty ? null : _password,
+        password: (widget.isEditMode && _password.isEmpty) ? null : _password,
       );
 
       widget.onSave(user);
@@ -438,12 +460,28 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              widget.onDelete(widget.userToEdit!.id);
+            onPressed: () async {
               Navigator.pop(dialogContext);
-              Navigator.pop(context);
+              final success = await context.read<UserProvider>().deleteData(
+                widget.userToEdit?.id,
+              );
+
+              if (success && context.mounted) {
+                context.pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Medicine deleted successfully'),
+                  ),
+                );
+              } else if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to delete medicine')),
+                );
+              }
+
+              Navigator.pop(context); 
             },
-            child: const Text('Delete'),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -452,7 +490,6 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
@@ -472,7 +509,7 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
               children: [
                 Text(
                   widget.isEditMode ? 'Edit User' : 'Add New User',
-                  style: textTheme.headlineMedium,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -489,7 +526,6 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                     initialValue: _fullName,
                     decoration: const InputDecoration(
                       labelText: 'Full Name',
-                      hintText: 'John Smith',
                       prefixIcon: Icon(Icons.person_outline),
                     ),
                     validator: (v) => v!.isEmpty ? 'Required' : null,
@@ -500,7 +536,6 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                     initialValue: _empId,
                     decoration: const InputDecoration(
                       labelText: 'Employee ID',
-                      hintText: 'EMP-001',
                       prefixIcon: Icon(Icons.badge_outlined),
                     ),
                     validator: (v) => v!.isEmpty ? 'Required' : null,
@@ -517,12 +552,19 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                             prefixIcon: Icon(
                               Icons.admin_panel_settings_outlined,
                             ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 15,
+                            ),
                           ),
                           items: _roles
                               .map(
                                 (r) => DropdownMenuItem(
                                   value: r,
-                                  child: Text(r.toUpperCase()),
+                                  child: Text(
+                                    r.toUpperCase(),
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
                                 ),
                               )
                               .toList(),
@@ -539,12 +581,19 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                           decoration: const InputDecoration(
                             labelText: 'Shift',
                             prefixIcon: Icon(Icons.schedule),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 15,
+                            ),
                           ),
                           items: _shifts
                               .map(
                                 (s) => DropdownMenuItem(
                                   value: s,
-                                  child: Text(s.toUpperCase()),
+                                  child: Text(
+                                    s.toUpperCase(),
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
                                 ),
                               )
                               .toList(),
@@ -560,8 +609,7 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: const InputDecoration(
-                      labelText: 'Salary (Rp)',
-                      hintText: 'e.g 5000000',
+                      labelText: 'Salary',
                       prefixIcon: Icon(Icons.monetization_on_outlined),
                       prefixText: 'Rp ',
                     ),
@@ -606,9 +654,7 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                     maxLines: 2,
                     decoration: const InputDecoration(
                       labelText: 'Address',
-                      hintText: 'Complete home address',
                       prefixIcon: Icon(Icons.home_outlined),
-                      alignLabelWithHint: true,
                     ),
                     validator: (v) => v!.isEmpty ? 'Required' : null,
                     onSaved: (v) => _address = v!,
@@ -618,7 +664,6 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                     initialValue: _email,
                     decoration: const InputDecoration(
                       labelText: 'Email',
-                      hintText: 'mail@example.com',
                       prefixIcon: Icon(Icons.email_outlined),
                     ),
                     validator: (v) =>
@@ -626,58 +671,57 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                     onSaved: (v) => _email = v!,
                   ),
                   const SizedBox(height: 16),
-                  if (!widget.isEditMode)
-                    TextFormField(
-                      obscureText: _obscurePassword,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
+                  TextFormField(
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: widget.isEditMode
+                          ? 'Password (Leave empty to keep)'
+                          : 'Password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
                         ),
                       ),
-                      validator: (v) {
-                        if (!widget.isEditMode) {
-                          if (v == null || v.isEmpty) return 'Required';
-                          if (v.length < 6) return 'Min 6 chars';
-                        }
-                        return null;
-                      },
-                      onSaved: (v) => _password = v!,
                     ),
+                    validator: (v) {
+                      if (!widget.isEditMode) {
+                        if (v == null || v.isEmpty) return 'Required';
+                        if (v.length < 6) return 'Min 6 chars';
+                      } else {
+                        if (v != null && v.isNotEmpty && v.length < 6)
+                          return 'Min 6 chars';
+                      }
+                      return null;
+                    },
+                    onSaved: (v) => _password = v ?? '',
+                  ),
                   const SizedBox(height: 32),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: _saveForm,
-                            child: Text(
-                              widget.isEditMode ? 'Update Data' : 'Save User',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                    ],
+                      onPressed: _saveForm,
+                      child: Text(
+                        widget.isEditMode ? 'Update Data' : 'Save User',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                   if (widget.isEditMode)
                     Padding(
@@ -715,7 +759,7 @@ extension DatumExt on Datum {
     if (name == null || name!.isEmpty) return '?';
     List<String> parts = name!.split(' ');
     if (parts.length > 1 && parts[1].isNotEmpty) {
-      return parts[0][0].toUpperCase() + parts[1][0].toUpperCase();
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
     return parts[0][0].toUpperCase();
   }

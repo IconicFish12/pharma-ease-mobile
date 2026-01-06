@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mobile_course_fp/data/model/user_model.dart';
 import 'package:mobile_course_fp/data/repository/repository.dart';
@@ -6,27 +7,11 @@ import 'package:mobile_course_fp/data/repository/service/dio_client.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
 class UserRepository implements Repository<Datum> {
-  static String endpoint =
-      'https://unuseful-odell-subincomplete.ngrok-free.dev/api/admin/users';
-
+  static String endpoint = '/admin/users';
   final TokenService tokenService;
   final Dio _dio;
 
-  UserRepository(this.tokenService) : _dio = DioClient(tokenService).dio {
-    _dio.interceptors.add(
-      LogInterceptor(requestBody: true, responseBody: true, error: true),
-    );
-  }
-
-  Options get _options => Options(
-    headers: {
-      "ngrok-skip-browser-warning": "true",
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-    },
-    followRedirects: false,
-    validateStatus: (status) => status! < 500,
-  );
+  UserRepository(this.tokenService) : _dio = DioClient(tokenService).dio;
 
   @override
   Future<Either<Failure, List<Datum>>> getMany({
@@ -36,13 +21,16 @@ class UserRepository implements Repository<Datum> {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParams,
-        options: _options,
       );
+
       if (response.statusCode == 200) {
         final wrapper = UserModel.fromJson(response.data);
         return Right(wrapper.data ?? []);
+      } else {
+        return Left(Failure("Server Error: ${response.statusCode}"));
       }
-      return Left(Failure("Server Error: ${response.statusCode}"));
+    } on DioException catch (e) {
+      return Left(Failure(e.message ?? "Terjadi kesalahan koneksi"));
     } catch (e) {
       return Left(Failure(e.toString()));
     }
@@ -51,12 +39,17 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> getOne(dynamic id) async {
     try {
-      final response = await _dio.get('$endpoint/$id', options: _options);
+      final response = await _dio.get('$endpoint/$id');
+
       if (response.statusCode == 200) {
-        final wrapper = UserModel.fromJson(response.data);
-        return Right(wrapper.data!.first);
+        final json = response.data['data'] ?? response.data;
+        final data = Datum.fromJson(json);
+        return Right(data);
       }
-      return Left(Failure("Data not found"));
+      return Left(Failure("Server Error: ${response.statusCode}"));
+    } on DioException catch (e) {
+      debugPrint("DioError GetOne: ${e.message}");
+      return Left(Failure(e.message ?? "Terjadi kesalahan koneksi"));
     } catch (e) {
       return Left(Failure(e.toString()));
     }
@@ -65,16 +58,31 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> create({required dynamic data}) async {
     try {
-      final response = await _dio.post(
-        endpoint,
-        data: data.toJson(),
-        options: _options,
+      debugPrint("API Request Create Payload: $data");
+
+      final response = await _dio.post(endpoint, data: data);
+
+      debugPrint(
+        "API Response Create: ${response.statusCode} - ${response.data}",
       );
+
       if (response.statusCode == 201 || response.statusCode == 200) {
-        return Right(data);
+        final json = response.data['data'] ?? response.data;
+        final createdUser = Datum.fromJson(json);
+        return Right(createdUser);
       }
-      return Left(_parseError(response));
+      return Left(Failure("Gagal create data: Status ${response.statusCode}"));
+    } on DioException catch (e) {
+      debugPrint("DioError Create: ${e.response?.data} | ${e.message}");
+      return Left(
+        Failure(
+          e.response?.data['message'] ??
+              e.message ??
+              "Terjadi kesalahan koneksi",
+        ),
+      );
     } catch (e) {
+      debugPrint("Error Create: $e");
       return Left(Failure(e.toString()));
     }
   }
@@ -82,20 +90,30 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> update(dynamic id, {required dynamic data}) async {
     try {
-      final Map<String, dynamic> body = data.toJson();
+      debugPrint("API Request Update Payload: $data");
 
-      body['_method'] = 'PUT';
-
-      final response = await _dio.post(
+      final response = await _dio.put(
         '$endpoint/$id',
-        data: body,
-        options: _options,
+        data: data,
       );
 
-      if (response.statusCode == 200) {
-        return Right(data);
+      debugPrint("API Response Update: ${response.statusCode}");
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final json = response.data['data'] ?? response.data;
+        final updatedUser = Datum.fromJson(json);
+        return Right(updatedUser); 
       }
-      return Left(_parseError(response));
+      return Left(Failure("Gagal update data: Status ${response.statusCode}"));
+    } on DioException catch (e) {
+      debugPrint("DioError Update: ${e.response?.data} | ${e.message}");
+      return Left(
+        Failure(
+          e.response?.data['message'] ??
+              e.message ??
+              "Terjadi kesalahan koneksi",
+        ),
+      );
     } catch (e) {
       return Left(Failure(e.toString()));
     }
@@ -104,31 +122,20 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, bool>> delete(dynamic id) async {
     try {
-      final response = await _dio.post(
-        '$endpoint/$id',
-        data: {'_method': 'DELETE'},
-        options: _options,
+      final response = await _dio.delete('$endpoint/$id');
+      debugPrint(
+        "delette Error: ${response.statusCode} | ${response.statusMessage}",
       );
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
+      if (response.statusCode == 200) {
         return const Right(true);
       }
-      return Left(_parseError(response));
+      return Left(Failure("Gagal delete"));
+    } on DioException catch (e) {
+      debugPrint("Update Error: ${e.message.toString()}");
+      return Left(Failure(e.message ?? "Terjadi kesalahan koneksi"));
     } catch (e) {
+      debugPrint("Update Error: ${e.toString()}");
       return Left(Failure(e.toString()));
     }
-  }
-
-  Failure _parseError(Response response) {
-    if (response.statusCode == 422 && response.data != null) {
-      final data = response.data;
-      if (data['message'] != null) return Failure(data['message']);
-    }
-    if (response.statusCode == 404) return Failure("URL Salah (404). Cek ID.");
-    if (response.statusCode == 405)
-      return Failure("Method 405. Cek Route Laravel.");
-    if (response.statusCode == 500)
-      return Failure("Server Error (500). Cek Log Laravel.");
-    return Failure("Error: ${response.statusCode}");
   }
 }
