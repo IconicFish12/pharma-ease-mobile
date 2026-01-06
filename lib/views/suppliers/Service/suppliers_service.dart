@@ -20,7 +20,7 @@ class SupplierService {
       if (token == null) {
         throw Exception('Token tidak ditemukan. Silakan login terlebih dahulu.');
       }
-      
+
       final response = await http.get(
         Uri.parse(Endpoints.supplierList.url),
         headers: {
@@ -75,7 +75,6 @@ Future<bool> createSupplier({
         },
         body: jsonEncode(data)
       );
-
       print("URL: ${Endpoints.supplierList.url}"); 
       print("Status Code: ${response.statusCode}"); 
 

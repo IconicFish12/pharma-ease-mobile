@@ -8,10 +8,30 @@ class SupplierViewModel extends ChangeNotifier {
   List<Supplier> _suppliers = [];
   bool _isLoading = false;
   String _errorMessage = '';
+  
+  String _searchQuery = '';
 
   List<Supplier> get suppliers => _suppliers;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
+
+  List<Supplier> get filteredSuppliers {
+    if (_searchQuery.isEmpty) {
+      return _suppliers;
+    }
+    
+    return _suppliers.where((supplier) {
+      final query = _searchQuery.toLowerCase();
+      return supplier.suppliersName.toLowerCase().contains(query) ||
+             supplier.contactPerson.toLowerCase().contains(query) ||
+             supplier.phoneNumber.contains(query);
+    }).toList();
+  }
+
+  void onSearchChanged(String query) {
+    _searchQuery = query;
+    notifyListeners(); 
+  }
 
   Future<void> fetchSuppliers() async {    
     _isLoading = true;
@@ -21,6 +41,9 @@ class SupplierViewModel extends ChangeNotifier {
     try {
       print("[VM] Memanggil Service..."); 
       _suppliers = await _service.getSuppliers();
+      
+      _searchQuery = ''; 
+      
       print("[VM] SUCCESS => mendapatkan ${_suppliers.length} data");
       print("[VM] DATA => $_suppliers");
     
@@ -41,7 +64,6 @@ class SupplierViewModel extends ChangeNotifier {
     required String address,
   }) async {
     
-    // 1. Set Loading
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -56,7 +78,7 @@ class SupplierViewModel extends ChangeNotifier {
       );
       if (isSuccess) {
         print("[VM] Create Berhasil!");
-        await fetchSuppliers(); 
+        await fetchSuppliers(); // Refresh list otomatis
         return true; 
       } else {
         _errorMessage = "Gagal menambahkan supplier";
@@ -82,7 +104,7 @@ class SupplierViewModel extends ChangeNotifier {
       final bool success = await _service.deleteSupplier(id);
 
       if (success) {
-        await fetchSuppliers();
+        await fetchSuppliers(); 
         return true;
       } else {
         _errorMessage = "Gagal menghapus data";

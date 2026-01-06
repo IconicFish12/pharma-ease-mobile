@@ -22,7 +22,7 @@ class _SupplierListState extends State<SupplierList> {
     });
   }
 
-void _showAddSupplierModal(BuildContext context) {
+  void _showAddSupplierModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -47,7 +47,7 @@ void _showAddSupplierModal(BuildContext context) {
     super.initState();
   }
 
-Future<void> _createNewSupplier(Supplier supplierData) async {
+  Future<void> _createNewSupplier(Supplier supplierData) async {
     final vm = Provider.of<SupplierViewModel>(context, listen: false);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Saving data...'), duration: Duration(milliseconds: 800)),
@@ -105,7 +105,7 @@ Future<void> _createNewSupplier(Supplier supplierData) async {
               ]),
             ),
           ),
-          // panggil vm
+          
           Consumer<SupplierViewModel>(
             builder: (context, vm, child) {
               if (vm.isLoading) {
@@ -117,7 +117,7 @@ Future<void> _createNewSupplier(Supplier supplierData) async {
                 );
               }
 
-              // cek error dari vm
+              // Cek error dari vm
               if (vm.errorMessage.isNotEmpty) {
                 return SliverToBoxAdapter(
                   child: Padding(
@@ -142,12 +142,21 @@ Future<void> _createNewSupplier(Supplier supplierData) async {
                   ),
                 );
               }
-              // cek data kosong
-              if (vm.suppliers.isEmpty) {
-                return const SliverToBoxAdapter(
+
+              // [NEW] Gunakan filteredSuppliers agar list berubah sesuai search
+              final displayList = vm.filteredSuppliers;
+
+              // Cek data kosong (baik karena search atau memang belum ada data)
+              if (displayList.isEmpty) {
+                return SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(32.0),
-                    child: Center(child: Text("Belum ada data supplier")),
+                    child: Center(
+                      // Pesan dinamis tergantung apakah ini hasil search atau bukan
+                      child: Text(vm.suppliers.isEmpty 
+                        ? "Belum ada data supplier" 
+                        : "Tidak ditemukan data pencarian"),
+                    ),
                   ),
                 );
               }
@@ -156,7 +165,7 @@ Future<void> _createNewSupplier(Supplier supplierData) async {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    final supplier = vm.suppliers[index];
+                    final supplier = displayList[index];
 
                     return SupplierListItem(
                       supplier: supplier,
@@ -187,7 +196,8 @@ Future<void> _createNewSupplier(Supplier supplierData) async {
                         );
                       },
                     );
-                  }, childCount: vm.suppliers.length),
+                  }, 
+                  childCount: displayList.length), // Gunakan length dari displayList
                 ),
               );
             },
@@ -207,6 +217,10 @@ Future<void> _createNewSupplier(Supplier supplierData) async {
 
   Widget _buildSearchBar(BuildContext context) {
     return TextField(
+      // [NEW] Trigger pencarian saat mengetik
+      onChanged: (value) {
+        Provider.of<SupplierViewModel>(context, listen: false).onSearchChanged(value);
+      },
       decoration: InputDecoration(
         hintText: 'Search suppliers...',
         prefixIcon: Icon(Icons.search),
@@ -222,6 +236,7 @@ Future<void> _createNewSupplier(Supplier supplierData) async {
   }
 }
 
+// Widget Item List (Tetap sama, tidak ada perubahan)
 class SupplierListItem extends StatelessWidget {
   final Supplier supplier;
   final VoidCallback onTap;
@@ -319,6 +334,8 @@ class SupplierListItem extends StatelessWidget {
     );
   }
 }
+
+// Widget Modal (Tetap sama, tidak ada perubahan logic)
 class AddEditSupplierModal extends StatefulWidget {
   final bool isEditMode;
   final Supplier? supplierToEdit;

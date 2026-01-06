@@ -19,6 +19,7 @@ import 'package:mobile_course_fp/data/repository/service/current_user_service.da
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 import 'package:mobile_course_fp/data/repository/supplier_repository.dart';
 import 'package:mobile_course_fp/data/repository/user_repository.dart';
+import 'package:mobile_course_fp/data/view-model/medicine_order_view_model.dart';
 import 'package:mobile_course_fp/firebase_options.dart';
 import 'package:mobile_course_fp/views/activity-log/activity_log.dart';
 import 'package:mobile_course_fp/views/auth/forgot_password.dart';
@@ -80,7 +81,7 @@ void main() async {
         // ViewModel 
         ChangeNotifierProvider(create: (_) => SupplierViewModel()),
         ChangeNotifierProvider(create: (_) => MedicineCategoryViewmodel()),
-
+        ChangeNotifierProvider(create: (_) => OrderViewmodel()),
         ChangeNotifierProvider(create: (_) => AuthProvider(authRepository, tokenService)),
         ChangeNotifierProvider(create: (_) => ActivityLogProvider(tokenService)),
         ChangeNotifierProvider(create: (_) => MedicineProvider(MedicineRepository(tokenService))),
@@ -104,7 +105,7 @@ class MyApp extends StatelessWidget {
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const OrderList()),
+        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
         GoRoute(
           name: 'Login',
           path: '/login',
