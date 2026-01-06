@@ -33,7 +33,6 @@ class Datum {
   // Mapping 'user_id' dari Laravel ke variabel 'id' di Flutter
   @JsonKey(name: "user_id")
   final String? id;
-
   @JsonKey(name: "name")
   final String? name;
   @JsonKey(name: "emp_id")

@@ -27,12 +27,12 @@ Map<String, dynamic> _$MedicineModelToJson(MedicineModel instance) =>
     };
 
 Datum _$DatumFromJson(Map<String, dynamic> json) => Datum(
-  id: json['id'] as String?,
+  id: _stringFromAny(json['id']),
   medicineName: json['medicineName'] as String?,
-  sku: json['sku'] as String?,
+  sku: _stringFromAny(json['sku']),
   stock: (json['stock'] as num?)?.toInt(),
   expiredDate: json['expiredDate'] as String?,
-  price: json['price'] as String?,
+  price: _stringFromAny(json['price']),
   category: json['category'] == null
       ? null
       : Category.fromJson(json['category'] as Map<String, dynamic>),
@@ -61,7 +61,7 @@ Map<String, dynamic> _$DatumToJson(Datum instance) => <String, dynamic>{
 };
 
 Category _$CategoryFromJson(Map<String, dynamic> json) => Category(
-  id: json['id'] as String?,
+  id: _stringFromAny(json['id']),
   categoryName: json['categoryName'] as String?,
   createdAt: json['createdAt'] == null
       ? null
@@ -79,7 +79,7 @@ Map<String, dynamic> _$CategoryToJson(Category instance) => <String, dynamic>{
 };
 
 Suplier _$SuplierFromJson(Map<String, dynamic> json) => Suplier(
-  id: json['id'] as String?,
+  id: _stringFromAny(json['id']),
   supplierName: json['supplierName'] as String?,
   contactPerson: json['contactPerson'] as String?,
   phone: json['phone'],

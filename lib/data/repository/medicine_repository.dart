@@ -7,7 +7,7 @@ import 'package:mobile_course_fp/data/repository/service/dio_client.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
 class MedicineRepository implements Repository<Datum> {
-   static String endpoint = '/admin/medicine';
+  static String endpoint = '/admin/medicine';
   final TokenService tokenService;
   final Dio _dio;
 
@@ -68,6 +68,8 @@ class MedicineRepository implements Repository<Datum> {
       debugPrint("API Response Create: ${response.statusCode} - ${response.data}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
+        
+
         final wrapper = Datum.fromJson(response.data['data']);
           return Right(wrapper);
         
