@@ -15,26 +15,6 @@ class SupplierList extends StatefulWidget {
 }
 
 class _SupplierListState extends State<SupplierList> {
-  // void _addSupplier(Supplier newSupplier) {
-  //   setState(() {
-  //     SupplierData.suppliers.add(newSupplier);
-  //   });
-  // }
-
-  // void _updateSupplier(Supplier updateSupplier) {
-  //   setState(() {
-  //     final index = SupplierData.suppliers.indexWhere((med) => med.id == updateSupplier.id);
-  //     if (index != -1) {
-  //       SupplierData.suppliers[index] = updateSupplier;
-  //     }
-  //   });
-  // }
-
-  // void _deleteSupplier(String supplierId) {
-  //   setState(() {
-  //     SupplierData.suppliers.removeWhere((med) => med.id == supplierId);
-  //   });
-  // }
 
   void _getAllSupplier() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -200,7 +180,6 @@ Future<void> _createNewSupplier(Supplier supplierData) async {
                                   );
                                 }
 
-                                // 4. Return status sukses/gagal ke halaman Detail
                                 return success;
                               },
                             ),
@@ -359,7 +338,6 @@ class AddEditSupplierModal extends StatefulWidget {
 class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
   final _formKey = GlobalKey<FormState>();
   
-  // HANYA 4 VARIABEL UTAMA SESUAI POSTMAN
   late String _suppliersName;
   late String _contactPerson;
   late String _phoneNumber;
@@ -385,11 +363,6 @@ class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       
-      // KITA BUAT OBJEK SUPPLIER
-      // Karena Model Supplier kamu mungkin masih mewajibkan field email/wa/quantity,
-      // kita isi dengan data dummy ('-' atau 0) agar tidak error codingannya.
-      // Data dummy ini tidak akan dikirim ke server karena ViewModel hanya mengambil 4 field di atas.
-      
       final newsupplier = Supplier(
         id: widget.isEditMode
             ? widget.supplierToEdit!.id
@@ -399,7 +372,6 @@ class _AddEditSupplierModalState extends State<AddEditSupplierModal> {
         phoneNumber: _phoneNumber,
         address: _address,
         
-        // --- DATA DUMMY (Untuk pelengkap Model saja) ---
         email: widget.isEditMode ? widget.supplierToEdit!.email : '-', 
         whatsappNumber: widget.isEditMode ? widget.supplierToEdit!.whatsappNumber : '-',
         medicineQuantity: widget.isEditMode ? widget.supplierToEdit!.medicineQuantity : 0,
