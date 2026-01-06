@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_course_fp/config/config.dart';
-import 'package:mobile_course_fp/views/order/order_detail.dart';
-import 'package:mobile_course_fp/views/order/order_model.dart';
+import 'package:mobile_course_fp/views/order/View/order_detail.dart';
+import 'package:mobile_course_fp/views/order/Model/order_model.dart';
+import 'package:mobile_course_fp/views/order/ViewModel/order_viewmodel.dart';
 import 'dart:math';
 import 'package:mobile_course_fp/views/suppliers/Model/suppliers_model.dart';
-
 class SupplierData {
   static final List<Supplier> suppliers = [
     Supplier(
@@ -89,7 +89,6 @@ class _OrderListState extends State<OrderList> {
       whatsappNumber: "+15550101",
       address: "123 Medical Ave, NY",
       orderDate: "2025-02-01",
-      expectedDeliveryDate: "2025-02-10",
       items: [
         OrderItem(name: "Paracetamol", price: 100000, amount: 3),
         OrderItem(name: "Amoxicillin", price: 150000, amount: 2),
@@ -104,8 +103,7 @@ class _OrderListState extends State<OrderList> {
       whatsappNumber: "+15550102",
       address: "456 Health St, CA",
       orderDate: "2025-01-28",
-      status: OrderStatus.failed,
-      expectedDeliveryDate: "2025-02-05",
+      status: OrderStatus.cancelled,
       items: [
         OrderItem(name: "Ibuprofen", price: 200000, amount: 2),
         OrderItem(name: "Paracetamol", price: 150000, amount: 1),
@@ -380,7 +378,6 @@ class _AddOrderModalState extends State<AddOrderModal> {
         whatsappNumber: selectedSupplier.whatsappNumber,
         address: selectedSupplier.address,
         orderDate: _dateController.text,
-        expectedDeliveryDate: "", 
         status: OrderStatus.pending,
         items: _tempItems, 
       );

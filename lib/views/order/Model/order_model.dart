@@ -9,7 +9,6 @@ class Order {
   String whatsappNumber;
   String address;
   String orderDate;
-  String expectedDeliveryDate;
   OrderStatus status;
 
   List<OrderItem> items;
@@ -23,7 +22,6 @@ class Order {
     required this.whatsappNumber,
     required this.address,
     required this.orderDate,
-    required this.expectedDeliveryDate,
     required this.items,
     this.status = OrderStatus.pending,
   });
@@ -40,9 +38,9 @@ class Order {
     switch (status) {
       case OrderStatus.pending:
         return Colors.yellow;
-      case OrderStatus.successful:
+      case OrderStatus.completed:
         return Colors.green;
-      case OrderStatus.failed:
+      case OrderStatus.cancelled:
         return Colors.red;
     }
   }
@@ -51,9 +49,9 @@ class Order {
     switch (status) {
       case OrderStatus.pending:
         return "Pending";
-      case OrderStatus.successful:
+      case OrderStatus.completed:
         return "Successful";
-      case OrderStatus.failed:
+      case OrderStatus.cancelled:
         return "Failed";
     }
   }
@@ -61,8 +59,8 @@ class Order {
 
 enum OrderStatus {
   pending,
-  successful,
-  failed,
+  completed,
+  cancelled,
 }
 
 class OrderItem {
@@ -76,6 +74,7 @@ class OrderItem {
     required this.amount,
   });
 
+  // Catalog static tetap ada
   static List<OrderItem> catalog = [
     OrderItem(name: "Paracetamol 500mg", price: 5000, amount: 0),
     OrderItem(name: "Amoxicillin 500mg", price: 12000, amount: 0),

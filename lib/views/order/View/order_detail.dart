@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_course_fp/views/order/order_model.dart';
+import 'package:mobile_course_fp/views/order/Model/order_model.dart';
 import 'package:mobile_course_fp/config/config.dart';
 
 class OrderDetailPage extends StatelessWidget {
@@ -86,12 +86,7 @@ class OrderDetailPage extends StatelessWidget {
                       "Order Date",
                       order.orderDate,
                     ),
-                    _buildDetailRow(
-                      context,
-                      Icons.calendar_today_outlined,
-                      "Delivery",
-                      order.expectedDeliveryDate,
-                    ),
+                    
                     _buildDetailRow(
                       context,
                       Icons.inventory_2_outlined,

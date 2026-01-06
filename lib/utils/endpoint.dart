@@ -1,5 +1,5 @@
 
-const String baseUrlRakha = "https://jamari-transuranic-uncentrally.ngrok-free.dev/api/admin"; 
+const String baseUrl = "https://jamari-transuranic-uncentrally.ngrok-free.dev/api/admin"; 
 
 enum Endpoints {
 
@@ -7,6 +7,7 @@ enum Endpoints {
   medicineCategory('/medicine-category'),
   supplierList('/suppliers'),
   login('/login'),
+  medicineOrder('/medicine-order'),
   users('users');
 
   final String path;
@@ -14,11 +15,11 @@ enum Endpoints {
 
 
   String get url {
-    print("$baseUrlRakha$path");
-    return "$baseUrlRakha$path"; 
+    print("$baseUrl$path");
+    return "$baseUrl$path"; 
   }
   // delete, edit
   String urlWithId(String id) {
-    return "$baseUrlRakha$path/$id";
+    return "$baseUrl$path/$id";
   }
 }

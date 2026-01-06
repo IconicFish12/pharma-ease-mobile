@@ -33,9 +33,9 @@ import 'package:mobile_course_fp/views/reports/home.dart';
 import 'package:mobile_course_fp/views/medicine/medicine_detail.dart';
 import 'package:mobile_course_fp/views/medicine/medicine_list.dart';
 import 'package:mobile_course_fp/views/notifications.dart';
-import 'package:mobile_course_fp/views/order/order_detail.dart';
-import 'package:mobile_course_fp/views/order/order_list.dart';
-import 'package:mobile_course_fp/views/order/order_model.dart';
+import 'package:mobile_course_fp/views/order/View/order_detail.dart';
+import 'package:mobile_course_fp/views/order/View/order_list.dart';
+import 'package:mobile_course_fp/views/order/Model/order_model.dart';
 import 'package:mobile_course_fp/views/reports/financial_report.dart';
 import 'package:mobile_course_fp/views/reports/medicine_report.dart';
 import 'package:mobile_course_fp/views/reports/reports.dart';
@@ -46,6 +46,7 @@ import 'package:mobile_course_fp/views/users/user_management_page.dart';
 import 'package:mobile_course_fp/views/suppliers/ViewModel/supplier_viewmodel.dart';
 import 'package:mobile_course_fp/views/medicine/medicine-category/ViewModel/medicine_category_viewmodel.dart';
 import 'package:provider/provider.dart';
+import 'package:mobile_course_fp/views/order/ViewModel/order_viewmodel.dart';
  
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -103,7 +104,7 @@ class MyApp extends StatelessWidget {
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const MedicineList()),
+        GoRoute(path: '/', builder: (context, state) => const OrderList()),
         GoRoute(
           name: 'Login',
           path: '/login',
