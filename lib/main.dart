@@ -103,7 +103,7 @@ class MyApp extends StatelessWidget {
       restorationScopeId: 'router',
       routerNeglect: true,
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+        GoRoute(path: '/', builder: (context, state) => const MedicineList()),
         GoRoute(
           name: 'Login',
           path: '/login',

@@ -5,21 +5,29 @@ import '../../../../data/model/medicine_category_model.dart';
 
 import '../Model/medicine_category_model.dart'; 
 import 'package:mobile_course_fp/utils/endpoint.dart';
+import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
 class MedicineCategoryService {
   final Dio _dio = Dio();
 
+  final TokenService _tokenService = TokenService();
+
+
   Future<List<Category>> getCategories() async {
     try {
       final String url = Endpoints.medicineCategory.url;
-
+      final String? token = await _tokenService.getToken();
+      print("TOKEN => $token");
+      if (token == null) {
+        throw Exception('Token tidak ditemukan. Silakan login terlebih dahulu.');
+      }
       final response = await _dio.get(
         url,
         options: Options(
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': 'bearer '
+            'Authorization': 'bearer $token'
           },
         ),
       );
