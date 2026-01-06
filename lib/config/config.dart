@@ -12,7 +12,7 @@ class Config {
   static const Color successGreen = Color(0xFF388E3C);
 
   static const String baseURLIbnu =
-      "https://unuseful-odell-subincomplete.ngrok-free.dev/api";
+      "https://unforgettable-anjanette-longshore.ngrok-free.dev/api";
   // static const String baseURLApril = "https://unuseful-odell-subincomplete.ngrok-free.dev/api";
   // static const String baseURLRakha = "https://unuseful-odell-subincomplete.ngrok-free.dev/api";
 
