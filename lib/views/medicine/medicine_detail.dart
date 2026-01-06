@@ -4,7 +4,7 @@ import 'package:mobile_course_fp/config/config.dart';
 import 'package:mobile_course_fp/data/model/medicine_model.dart';
 import 'package:mobile_course_fp/data/provider/medicine_provider.dart';
 import 'package:mobile_course_fp/views/medicine/form/add_edit_medicine_modal.dart';
-import 'package:mobile_course_fp/views/medicine/view-model/extension/medicine_ui_extension.dart';
+import 'package:mobile_course_fp/views/medicine/extension/medicine_ui_extension.dart';
 import 'package:provider/provider.dart';
 
 class MedicineDetail extends StatefulWidget {

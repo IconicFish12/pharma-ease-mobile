@@ -58,7 +58,7 @@ class MedicineOrderRepository implements Repository<Datum> {
   }
 
   @override
-  Future<Either<Failure, Datum>> create(Datum data) async {
+  Future<Either<Failure, Datum>> create({required dynamic data}) async {
     try {
       final response = await _dio.post(endpoint, data: data.toJson());
 
@@ -76,7 +76,7 @@ class MedicineOrderRepository implements Repository<Datum> {
   }
 
   @override
-  Future<Either<Failure, Datum>> update(dynamic id, Datum data) async {
+  Future<Either<Failure, Datum>> update(dynamic id, {required dynamic data}) async {
     try {
       final response = await _dio.put(
         '$endpoint/$id',

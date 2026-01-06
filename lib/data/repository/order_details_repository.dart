@@ -9,7 +9,7 @@ class OrderDetailsRepository implements Repository{
   }
 
   @override
-  Future<Either<Failure, dynamic>> create(data) {
+  Future<Either<Failure, dynamic>> create({required dynamic data}) {
     // TODO: implement create
     throw UnimplementedError();
   }
@@ -21,7 +21,7 @@ class OrderDetailsRepository implements Repository{
   }
 
   @override
-  Future<Either<Failure, dynamic>> update(id, data) {
+  Future<Either<Failure, dynamic>> update(id, {required dynamic data}) {
     // TODO: implement update
     throw UnimplementedError();
   }

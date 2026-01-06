@@ -7,7 +7,7 @@ import 'package:mobile_course_fp/data/provider/provider.dart';
 import 'package:mobile_course_fp/views/medicine/form/add_edit_medicine_modal.dart';
 import 'package:mobile_course_fp/views/medicine/medicine-category/View/medicine_category.dart';
 import 'package:mobile_course_fp/views/medicine/medicine-category/ViewModel/medicine_category_viewmodel.dart';
-import 'package:mobile_course_fp/views/medicine/view-model/extension/medicine_ui_extension.dart';
+import 'package:mobile_course_fp/views/medicine/extension/medicine_ui_extension.dart';
 import 'package:provider/provider.dart';
 
 class MedicineList extends StatefulWidget {

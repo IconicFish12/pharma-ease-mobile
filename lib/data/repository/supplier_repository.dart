@@ -6,7 +6,7 @@ import 'package:mobile_course_fp/data/repository/service/dio_client.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
 class SupplierRepository implements Repository<Datum> {
-  static String endpoint = 'http://localhost:8000/api/admin/suppliers';
+  static String endpoint = '/admin/suppliers';
   final TokenService tokenService;
   final Dio _dio;
 
@@ -58,7 +58,7 @@ class SupplierRepository implements Repository<Datum> {
   }
 
   @override
-  Future<Either<Failure, Datum>> create(Datum data) async {
+  Future<Either<Failure, Datum>> create({required dynamic data}) async {
     try {
       final response = await _dio.post(endpoint, data: data.toJson());
 
@@ -77,7 +77,10 @@ class SupplierRepository implements Repository<Datum> {
   }
 
   @override
-  Future<Either<Failure, Datum>> update(dynamic id, Datum data) async {
+  Future<Either<Failure, Datum>> update(
+    dynamic id, {
+    required dynamic data,
+  }) async {
     try {
       final response = await _dio.put(
         '$endpoint/$id',

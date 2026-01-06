@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mobile_course_fp/data/model/medicine_model.dart';
 import 'package:mobile_course_fp/data/repository/repository.dart';
@@ -6,7 +7,7 @@ import 'package:mobile_course_fp/data/repository/service/dio_client.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
 class MedicineRepository implements Repository<Datum> {
-  static String endpoint = '/admin/medicine';
+   static String endpoint = '/admin/medicine';
   final TokenService tokenService;
   final Dio _dio;
 
@@ -24,15 +25,13 @@ class MedicineRepository implements Repository<Datum> {
 
       if (response.statusCode == 200) {
         final wrapper = MedicineModel.fromJson(response.data);
-
-        final List<Datum> dataList = wrapper.data ?? [];
-
-        return Right(dataList);
+        return Right(wrapper.data ?? []);
       } else {
         return Left(Failure("Server Error: ${response.statusCode}"));
       }
     } on DioException catch (e) {
-      return Left(Failure(e.message ?? "Terjadi kesalahan koneksi"));
+      debugPrint("DioError GetMany: ${e.message}");
+      return Left(Failure(e.response?.data['message'] ?? "Terjadi kesalahan koneksi"));
     } catch (e) {
       return Left(Failure(e.toString()));
     }
@@ -47,12 +46,12 @@ class MedicineRepository implements Repository<Datum> {
         final wrapper = MedicineModel.fromJson(response.data);
         if (wrapper.data != null && wrapper.data!.isNotEmpty) {
           return Right(wrapper.data!.first);
-        } else {
-          return Left(Failure("Data tidak ditemukan"));
         }
+        return Left(Failure("Data tidak ditemukan"));
       }
-      return Left(Failure("Server Error"));
+      return Left(Failure("Server Error: ${response.statusCode}"));
     } on DioException catch (e) {
+      debugPrint("DioError GetOne: ${e.message}");
       return Left(Failure(e.message ?? "Terjadi kesalahan koneksi"));
     } catch (e) {
       return Left(Failure(e.toString()));
@@ -60,40 +59,50 @@ class MedicineRepository implements Repository<Datum> {
   }
 
   @override
-  Future<Either<Failure, Datum>> create(Datum data) async {
+  Future<Either<Failure, Datum>> create({required dynamic data}) async {
     try {
-      final response = await _dio.post(endpoint, data: data.toJson());
+      debugPrint("API Request Create Payload: $data");
+
+      final response = await _dio.post(endpoint, data: data);
+
+      debugPrint("API Response Create: ${response.statusCode} - ${response.data}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        final wrapper = MedicineModel.fromJson(response.data);
-        if (wrapper.data != null && wrapper.data!.isNotEmpty) {
-          return Right(wrapper.data!.first);
-        }
-        return Left(Failure("Gagal parsing response create"));
+        final wrapper = Datum.fromJson(response.data['data']);
+          return Right(wrapper);
+        
       }
-      return Left(Failure("Gagal create data"));
+      return Left(Failure("Gagal create data: Status ${response.statusCode}"));
     } on DioException catch (e) {
-      return Left(Failure(e.message ?? "Terjadi kesalahan koneksi"));
+      debugPrint("DioError Create: ${e.response?.data} | ${e.message}");
+      return Left(Failure(e.response?.data['message'] ?? e.message ?? "Terjadi kesalahan koneksi"));
     } catch (e) {
+      debugPrint("Error Create: $e");
       return Left(Failure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, Datum>> update(dynamic id, Datum data) async {
+  Future<Either<Failure, Datum>> update(dynamic id, {required dynamic data}) async {
     try {
+      debugPrint("API Request Update Payload: $data");
+
       final response = await _dio.put(
         '$endpoint/$id',
-        data: data.toJson(),
+        data: data,
       );
 
-      if (response.statusCode == 200) {
-        final wrapper = MedicineModel.fromJson(response.data);
-        return Right(wrapper.data!.first);
+      debugPrint("API Response Update: ${response.statusCode}");
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final wrapper = Datum.fromJson(response.data['data']);
+
+          return Right(wrapper);
       }
-      return Left(Failure("Gagal update"));
+      return Left(Failure("Gagal update data: Status ${response.statusCode}"));
     } on DioException catch (e) {
-      return Left(Failure(e.message ?? "Terjadi kesalahan koneksi"));
+       debugPrint("DioError Update: ${e.response?.data} | ${e.message}");
+      return Left(Failure(e.response?.data['message'] ?? e.message ?? "Terjadi kesalahan koneksi"));
     } catch (e) {
       return Left(Failure(e.toString()));
     }
