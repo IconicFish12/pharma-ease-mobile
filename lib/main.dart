@@ -45,7 +45,7 @@ import 'package:mobile_course_fp/views/users/user_management_page.dart';
 import 'package:mobile_course_fp/views/suppliers/ViewModel/supplier_viewmodel.dart';
 import 'package:mobile_course_fp/views/medicine/medicine-category/ViewModel/medicine_category_viewmodel.dart';
 import 'package:provider/provider.dart';
-
+ 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

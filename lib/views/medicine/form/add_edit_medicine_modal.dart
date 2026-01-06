@@ -252,10 +252,12 @@ class _AddEditMedicineModalState extends State<AddEditMedicineModal> {
                             hintText: '0',
                           ),
                           validator: (value) {
-                            if (value == null || value.isEmpty)
+                            if (value == null || value.isEmpty) {
                               return 'Required';
-                            if (int.tryParse(value) == null)
+                            }
+                            if (int.tryParse(value) == null) {
                               return 'Invalid number';
+                            }
                             return null;
                           },
                           onSaved: (value) => _quantity = int.parse(value!),
@@ -275,8 +277,9 @@ class _AddEditMedicineModalState extends State<AddEditMedicineModal> {
                             hintText: '0',
                           ),
                           validator: (value) {
-                            if (value == null || value.isEmpty)
+                            if (value == null || value.isEmpty) {
                               return 'Required';
+                            }
                             // Validasi apakah input hanya berisi angka (setelah dibersihkan)
                             String clean = value.replaceAll(
                               RegExp(r'[^0-9]'),
