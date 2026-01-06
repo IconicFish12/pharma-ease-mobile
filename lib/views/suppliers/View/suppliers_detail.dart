@@ -29,32 +29,85 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
     _currentSupplier = widget.supplier;
   }
 
+  // --- Implementasi Logika Delete ---
+  void _confirmDelete() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Hapus Supplier'),
+          content: Text('Apakah Anda yakin ingin menghapus ${_currentSupplier.suppliersName}?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Config.errorRed),
+              onPressed: () {
+                widget.onDelete(_currentSupplier.id);
+                Navigator.pop(context); // Tutup dialog
+                context.pop(); // Kembali ke list supplier
+              },
+              child: const Text('Hapus', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // --- Implementasi Logika Edit ---
+  void _handleEdit() async {
+    // Memanggil callback editSupplier yang dikirim dari parent
+    final updatedSupplier = await widget.editSupplier(_currentSupplier);
+    
+    // Jika ada data yang kembali (setelah user simpan perubahan)
+    if (updatedSupplier != null && mounted) {
+      setState(() {
+        _currentSupplier = updatedSupplier;
+      });
+    }
+  }
+
+  // --- Launcher Helpers ---
   Future<void> _launchPhoneCall(String phoneNumber) async {
     final Uri url = Uri(scheme: 'tel', path: phoneNumber);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      _showErrorSnackBar('Could not launch phone call.');
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        _showErrorSnackBar('Tidak dapat melakukan panggilan telepon.');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error: $e');
     }
   }
 
   Future<void> _launchWhatsApp(String whatsappNumber) async {
-    // Hapus spasi dan +
     String formattedNumber = whatsappNumber.replaceAll(RegExp(r'[\s+]'), '');
     final Uri url = Uri.parse('https://wa.me/$formattedNumber');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      _showErrorSnackBar('Could not open WhatsApp.');
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        _showErrorSnackBar('WhatsApp tidak ditemukan.');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error: $e');
     }
   }
 
   Future<void> _launchEmail(String email) async {
     final Uri url = Uri(scheme: 'mailto', path: email);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      _showErrorSnackBar('Could not open email app.');
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        _showErrorSnackBar('Aplikasi Email tidak ditemukan.');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error: $e');
     }
   }
 
@@ -72,10 +125,7 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          _currentSupplier.suppliersName,
-          style: textTheme.titleLarge,
-        ),
+        title: const Text('Detail Supplier'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Config.textPrimary),
           onPressed: () => context.pop(),
@@ -83,23 +133,13 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
         actions: [
           IconButton(
             icon: Icon(Icons.edit_outlined, color: Config.primaryGreen),
-            onPressed: () {
-              // TODO: Panggil _showEditSupplierModal
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit feature coming soon!')),
-              );
-            },
+            onPressed: _handleEdit,
             tooltip: 'Edit Supplier',
           ),
           IconButton(
             icon: Icon(Icons.delete_outline, color: Config.errorRed),
-            onPressed: () {
-              // TODO: Panggil _confirmDelete
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Delete feature coming soon!')),
-              );
-            },
-            tooltip: 'Delete Supplier',
+            onPressed: _confirmDelete,
+            tooltip: 'Hapus Supplier',
           ),
         ],
       ),
@@ -111,10 +151,7 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
             // --- Kartu Kontak Utama ---
             Card(
               elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              margin: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -122,18 +159,18 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
                   children: [
                     Text(
                       _currentSupplier.contactPerson,
-                      style: textTheme.headlineMedium,
+                      style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'Contact at ${_currentSupplier.suppliersName}',
-                      style: textTheme.bodyMedium,
+                      'Kontak di ${_currentSupplier.suppliersName}',
+                      style: textTheme.bodyMedium?.copyWith(color: Config.textSecondary),
                     ),
-                    Divider(height: 24),
+                    const Divider(height: 32),
                     _buildDetailRow(
                       context,
                       Icons.phone_outlined,
-                      'Phone',
+                      'Telepon',
                       _currentSupplier.phoneNumber,
                     ),
                     _buildDetailRow(
@@ -145,7 +182,7 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
                     _buildDetailRow(
                       context,
                       Icons.location_on_outlined,
-                      'Address',
+                      'Alamat',
                       _currentSupplier.address,
                       isAddress: true,
                     ),
@@ -153,37 +190,31 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
                 ),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-            // --- Kartu Aksi (KEUNIKAN) ---
-            Text('Quick Actions', style: textTheme.titleLarge),
-            SizedBox(height: 12),
+            Text('Aksi Cepat', style: textTheme.titleLarge),
+            const SizedBox(height: 12),
             Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildActionChip(
                       context,
                       icon: Icons.call_outlined,
-                      label: 'Call',
+                      label: 'Telepon',
                       color: Config.accentBlue,
-                      onTap: () =>
-                          _launchPhoneCall(_currentSupplier.phoneNumber),
+                      onTap: () => _launchPhoneCall(_currentSupplier.phoneNumber),
                     ),
                     _buildActionChip(
                       context,
                       icon: Icons.chat_bubble_outline,
                       label: 'WhatsApp',
                       color: Config.successGreen,
-                      onTap: () =>
-                          _launchWhatsApp(_currentSupplier.whatsappNumber),
+                      onTap: () => _launchWhatsApp(_currentSupplier.whatsappNumber),
                     ),
                     _buildActionChip(
                       context,
@@ -196,17 +227,13 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
                 ),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-            // --- Kartu Info Lain ---
-            Text('Supplier Info', style: textTheme.titleLarge),
-            SizedBox(height: 12),
+            Text('Informasi Supplier', style: textTheme.titleLarge),
+            const SizedBox(height: 12),
             Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -214,8 +241,8 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
                     _buildDetailRow(
                       context,
                       Icons.inventory_2_outlined,
-                      'Catalog',
-                      '${_currentSupplier.medicineQuantity} items',
+                      'Katalog',
+                      '${_currentSupplier.medicineQuantity} Item Obat',
                     ),
                     _buildDetailRow(
                       context,
@@ -234,6 +261,8 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
     );
   }
 
+  // --- Implementasi Widget Helpers yang Kosong ---
+
   Widget _buildDetailRow(
     BuildContext context,
     IconData icon,
@@ -249,20 +278,23 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 20, color: Config.textSecondary),
-          SizedBox(width: 12),
-          SizedBox(
-            width: 80, // Lebar tetap untuk label
-            child: Text(label, style: textTheme.bodyMedium),
-          ),
+          const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              value,
-              style: textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: statusColor ?? Config.textPrimary,
-              ),
-              maxLines: isAddress ? 3 : 1,
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: textTheme.bodySmall?.copyWith(color: Config.textSecondary)),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: statusColor ?? Config.textPrimary,
+                  ),
+                  maxLines: isAddress ? 4 : 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
         ],
@@ -279,26 +311,31 @@ class _SuppliersDetailState extends State<SuppliersDetail> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 26),
             ),
-            child: Icon(icon, size: 28, color: color),
-          ),
-          SizedBox(height: 8),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
