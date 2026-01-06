@@ -1,5 +1,5 @@
 
-const String baseUrl = "http://10.0.2.2:8000/api"; 
+const String baseUrlRakha = "https://jamari-transuranic-uncentrally.ngrok-free.dev/api/admin"; 
 
 enum Endpoints {
 
@@ -14,11 +14,11 @@ enum Endpoints {
 
 
   String get url {
-    print("$baseUrl$path");
-    return "$baseUrl$path"; 
+    print("$baseUrlRakha$path");
+    return "$baseUrlRakha$path"; 
   }
   // delete, edit
   String urlWithId(int id) {
-    return "$baseUrl$path$id";
+    return "$baseUrlRakha$path$id";
   }
 }

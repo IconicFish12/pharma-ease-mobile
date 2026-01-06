@@ -3,17 +3,27 @@ import '../../../utils/endpoint.dart';
 import '../../../data/model/supplier_model.dart'; 
 import '../Model/suppliers_model.dart'; 
 import '../Mapper/suppliers_mapper.dart'; 
+import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 
 
 class SupplierService {
+
+  final TokenService _tokenService = TokenService();
   
   Future<List<Supplier>> getSuppliers() async {
     try {
+      final String? token = await _tokenService.getToken();
+
+      if (token == null) {
+        throw Exception('Token tidak ditemukan. Silakan login terlebih dahulu.');
+      }
+      
       final response = await http.get(
         Uri.parse(Endpoints.supplierList.url),
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json", 
+          "Authorization": "Bearer $token",
         },
       );
 

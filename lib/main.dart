@@ -58,18 +58,24 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     print("DEBUG: Firebase Berhasil Connect!");
+    print("DEBUG: Firebase Berhasil Connect!");
   } catch (e) {
+    print("DEBUG: Error Firebase => $e");
     print("DEBUG: Error Firebase => $e");
   }
 
   print("DEBUG: Mulai inisialisasi Date Formatting...");
+  print("DEBUG: Mulai inisialisasi Date Formatting...");
   await initializeDateFormatting('id_ID', '');
+
+  print("DEBUG: Menjalankan runApp...");
 
   print("DEBUG: Menjalankan runApp...");
 
   runApp(
     MultiProvider(
       providers: [
+        // ViewModel 
         ChangeNotifierProvider(create: (_) => SupplierViewModel()),
         ChangeNotifierProvider(create: (_) => MedicineCategoryViewmodel()),
         ChangeNotifierProvider(

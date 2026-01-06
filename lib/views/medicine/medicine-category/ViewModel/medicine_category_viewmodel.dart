@@ -17,7 +17,6 @@ class MedicineCategoryViewmodel extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
-
     try {
       _categories = await _categoryService.getCategories();
     } catch (e) {
