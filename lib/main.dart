@@ -15,6 +15,7 @@ import 'package:mobile_course_fp/data/repository/auth_repository.dart';
 import 'package:mobile_course_fp/data/repository/medicine_category_repository.dart';
 import 'package:mobile_course_fp/data/repository/medicine_order_repository.dart';
 import 'package:mobile_course_fp/data/repository/medicine_repository.dart';
+import 'package:mobile_course_fp/data/repository/service/current_user_service.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
 import 'package:mobile_course_fp/data/repository/supplier_repository.dart';
 import 'package:mobile_course_fp/data/repository/user_repository.dart';
@@ -24,7 +25,7 @@ import 'package:mobile_course_fp/views/auth/forgot_password.dart';
 import 'package:mobile_course_fp/views/auth/login.dart';
 import 'package:mobile_course_fp/views/auth/send_email.dart';
 import 'package:mobile_course_fp/views/cashier/cashier_menu.dart';
-import 'package:mobile_course_fp/views/cashier/cashier_model.dart';
+import 'package:mobile_course_fp/views/cashier/Model/cashier_model.dart';
 import 'package:mobile_course_fp/views/cashier/receipt.dart';
 import 'package:mobile_course_fp/views/cashier/transaction_detail.dart';
 import 'package:mobile_course_fp/views/cashier/transaction_summary.dart';
@@ -78,6 +79,7 @@ void main() async {
         // ViewModel 
         ChangeNotifierProvider(create: (_) => SupplierViewModel()),
         ChangeNotifierProvider(create: (_) => MedicineCategoryViewmodel()),
+
         ChangeNotifierProvider(
           create: (_) => AuthProvider(authRepository, tokenService),
         ),
@@ -194,35 +196,34 @@ class MyApp extends StatelessWidget {
           path: '/notifications',
           builder: (context, state) => const Notifications(),
         ),
-        GoRoute(
-          name: 'Cashier',
-          path: '/cashier',
-          builder: (context, state) => const CashierMenu(),
-          routes: [
-            GoRoute(
-              name: 'TransactionSummary',
-              path: 'transaction-summary',
-              builder: (context, state) => const TransactionSummary(),
-            ),
-            GoRoute(
-              name: 'TransactionDetail',
-              path: 'detail',
-              builder: (context, state) {
-                final cartItems = state.extra as List<CartItem>?;
-                return TransactionDetailPage(cartItems: cartItems ?? []);
-              },
-            ),
-
-            GoRoute(
-              name: 'Receipt',
-              path: 'receipt',
-              builder: (context, state) {
-                final transaction = state.extra as Transaction;
-                return ReceiptPage(transaction: transaction);
-              },
-            ),
-          ],
-        ),
+        // GoRoute(
+        //   name: 'Cashier',
+        //   path: '/cashier',
+        //   builder: (context, state) => const CashierMenu(),
+        //   routes: [
+        //     GoRoute(
+        //       name: 'TransactionSummary',
+        //       path: 'transaction-summary',
+        //       builder: (context, state) => const TransactionSummary(),
+        //     ),
+        //     GoRoute(
+        //       name: 'TransactionDetail',
+        //       path: 'detail',
+        //       builder: (context, state) {
+        //         final cartItems = state.extra as List<CartItem>?;
+        //         return TransactionDetailPage(cartItems: cartItems ?? []);
+        //       },
+        //     ),
+        //     GoRoute(
+        //       name: 'Receipt',
+        //       path: 'receipt',
+        //       builder: (context, state) {
+        //         final transaction = state.extra as Transaction;
+        //         return ReceiptPage(transaction: transaction);
+        //       },
+        //     ),
+        //   ],
+        // ),
         GoRoute(
           name: 'Reports',
           path: '/reports',

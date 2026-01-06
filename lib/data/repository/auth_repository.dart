@@ -4,12 +4,15 @@ import 'package:mobile_course_fp/data/model/auth_model.dart';
 import 'package:mobile_course_fp/data/repository/repository.dart';
 import 'package:mobile_course_fp/data/repository/service/dio_client.dart';
 import 'package:mobile_course_fp/data/repository/service/token_service.dart';
+import 'package:mobile_course_fp/data/repository/service/current_user_service.dart';
 
 enum ViewState { initial, loading, success, error }
 
 class AuthRepository {
   final TokenService _tokenService;
+  final CurrentUserService _currentUserService = CurrentUserService(); 
   final Dio _dio;
+
 
   AuthRepository(this._tokenService) : _dio = DioClient(_tokenService).dio;
 
@@ -26,12 +29,20 @@ class AuthRepository {
       if (response.statusCode == 200) {
         try {
           print(response.data);
-
           final token = response.data['token'] as String;
+          final userId = response.data['user']['user_id'] as String;
 
+          // Save token
           if (token.isNotEmpty) {
             await _tokenService.saveToken(token);
           }
+
+          // Save user id
+          if (userId.isNotEmpty) {
+            print("USER ID => $userId");
+            await _currentUserService.saveUserId(userId);
+            print('Saving user id: $userId');
+          } 
 
           final authModel = AuthModel.fromJson(response.data);
           return Right(authModel);
@@ -62,7 +73,10 @@ class AuthRepository {
     try {
       final response = await _dio.post("/logout");
 
+      // delete current saved token
       await _tokenService.deleteToken();
+      // delete current saved userid
+      await _currentUserService.deleteUserId();
 
       if (response.statusCode == 200) {
         return const Right(null);

@@ -35,7 +35,6 @@ class AuthProvider extends ChangeNotifier{
     notifyListeners();
 
     final result = await authRepository.login(email, password);
-
     return result.fold(
       (failure) {
         _state = ViewState.error;
