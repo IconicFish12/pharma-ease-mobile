@@ -25,14 +25,14 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
 };
 
 Datum _$DatumFromJson(Map<String, dynamic> json) => Datum(
-  id: json['user_id'] as String?,
+  id: _readId(json, 'user_id') as String?,
   name: json['name'] as String?,
   empId: json['emp_id'] as String?,
   email: json['email'] as String?,
   role: json['role'] as String?,
   shift: json['shift'] as String?,
   dateOfBirth: json['date_of_birth'] as String?,
-  address: json['alamat'] as String?,
+  address: _readAddress(json, 'alamat') as String?,
   salary: json['salary'],
   startDate: json['start_date'] as String?,
   avatar: json['avatar'],

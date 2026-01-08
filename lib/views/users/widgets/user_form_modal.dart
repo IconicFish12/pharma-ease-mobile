@@ -1,325 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:mobile_course_fp/data/model/user_model.dart';
-import 'package:mobile_course_fp/data/provider/user_provider.dart';
-import 'package:mobile_course_fp/data/provider/provider.dart';
 
-class UserManagementPage extends StatefulWidget {
-  const UserManagementPage({super.key});
-
-  @override
-  State<UserManagementPage> createState() => _UserManagementPageState();
-}
-
-class _UserManagementPageState extends State<UserManagementPage> {
-  final TextEditingController _searchController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      context.read<UserProvider>().fetchList();
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _addUser(Datum newUser) async {
-    final provider = context.read<UserProvider>();
-    final bool success = await provider.addData(data: newUser);
-
-    if (mounted) {
-      if (success) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('User added successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed: ${provider.errorMessage}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _updateUser(Datum updatedUser) async {
-    final provider = context.read<UserProvider>();
-    final bool success = await provider.updateData(
-      updatedUser.id,
-      data: updatedUser,
-    );
-
-    if (mounted) {
-      if (success) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('User updated successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed: ${provider.errorMessage}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _deleteUser(dynamic userId) async {
-    final provider = context.read<UserProvider>();
-    final bool success = await provider.deleteData(userId);
-
-    if (mounted) {
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User deleted successfully')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to delete: ${provider.errorMessage}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  void _onSearch(String query) {
-    context.read<UserProvider>().fetchList(params: {'search': query});
-  }
-
-  void _showAddEditUserModal({bool isEditMode = false, Datum? user}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: _AddEditUserModal(
-          isEditMode: isEditMode,
-          userToEdit: user,
-          onSave: isEditMode ? _updateUser : _addUser,
-          onDelete: _deleteUser,
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('User Management', style: textTheme.titleLarge),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await context.read<UserProvider>().fetchList();
-        },
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'User & Employee Management',
-                    style: textTheme.headlineMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSearchBar(context),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Consumer<UserProvider>(
-                builder: (context, provider, child) {
-                  if (provider.state == ViewState.loading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (provider.state == ViewState.error) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.error_outline,
-                            color: Colors.red,
-                            size: 48,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Terjadi Kesalahan:",
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              provider.errorMessage ?? "Unknown Error",
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              context.read<UserProvider>().fetchList();
-                            },
-                            child: const Text("Coba Lagi"),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  if (provider.listData.isEmpty) {
-                    return const Center(child: Text("Belum ada data user."));
-                  }
-
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    itemCount: provider.listData.length,
-                    itemBuilder: (context, index) {
-                      final user = provider.listData[index];
-                      return UserListItem(
-                        user: user,
-                        onTap: () =>
-                            _showAddEditUserModal(isEditMode: true, user: user),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddEditUserModal(isEditMode: false),
-        backgroundColor: Colors.green,
-        label: const Text('Add New User'),
-        icon: const Icon(Icons.person_add_alt_1_outlined),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar(BuildContext context) {
-    return TextField(
-      controller: _searchController,
-      onSubmitted: _onSearch,
-      textInputAction: TextInputAction.search,
-      decoration: InputDecoration(
-        hintText: 'Search users...',
-        prefixIcon: const Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        filled: true,
-        fillColor: Colors.grey[100],
-        contentPadding: const EdgeInsets.symmetric(vertical: 0),
-      ),
-    );
-  }
-}
-
-class UserListItem extends StatelessWidget {
-  final Datum user;
-  final VoidCallback onTap;
-
-  const UserListItem({super.key, required this.user, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListTile(
-        onTap: onTap,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          radius: 24,
-          backgroundColor: user.roleColor.withOpacity(0.15),
-          child: Text(
-            user.initials,
-            style: textTheme.titleLarge?.copyWith(
-              color: user.roleColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        title: Text(user.name ?? 'No Name', style: textTheme.titleLarge),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(user.email ?? '-', style: textTheme.bodyMedium),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: user.roleColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    user.role?.toUpperCase() ?? '-',
-                    style: textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: user.roleColor,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '• ${user.shift?.toUpperCase() ?? '-'}',
-                  style: textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ],
-        ),
-        trailing: const Icon(Icons.chevron_right),
-      ),
-    );
-  }
-}
-
-class _AddEditUserModal extends StatefulWidget {
+class UserFormModal extends StatefulWidget {
   final bool isEditMode;
   final Datum? userToEdit;
   final Function(Datum) onSave;
   final Function(dynamic) onDelete;
 
-  const _AddEditUserModal({
+  const UserFormModal({
+    super.key,
     required this.isEditMode,
     this.userToEdit,
     required this.onSave,
@@ -327,10 +18,10 @@ class _AddEditUserModal extends StatefulWidget {
   });
 
   @override
-  State<_AddEditUserModal> createState() => _AddEditUserModalState();
+  State<UserFormModal> createState() => _UserFormModalState();
 }
 
-class _AddEditUserModalState extends State<_AddEditUserModal> {
+class _UserFormModalState extends State<UserFormModal> {
   final _formKey = GlobalKey<FormState>();
 
   late String _userId;
@@ -448,6 +139,7 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
   void _saveForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
       final user = Datum(
         id: widget.isEditMode ? widget.userToEdit!.id : null,
         name: _fullName,
@@ -483,28 +175,10 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(dialogContext);
-              final success = await context.read<UserProvider>().deleteData(
-                widget.userToEdit?.id,
-              );
+              await widget.onDelete(widget.userToEdit?.id);
 
               if (context.mounted) {
-                if (success) {
-                  Navigator.pop(context);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('User deleted successfully'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Failed to delete user'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
+                Navigator.pop(context); // Tutup BottomSheet
               }
             },
             child: const Text('Delete', style: TextStyle(color: Colors.white)),
@@ -720,8 +394,9 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
                         if (v == null || v.isEmpty) return 'Required';
                         if (v.length < 6) return 'Min 6 chars';
                       } else {
-                        if (v != null && v.isNotEmpty && v.length < 6)
+                        if (v != null && v.isNotEmpty && v.length < 6) {
                           return 'Min 6 chars';
+                        }
                       }
                       return null;
                     },
@@ -768,25 +443,5 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
         ),
       ),
     );
-  }
-}
-
-extension DatumExt on Datum {
-  Color get roleColor {
-    final r = role?.toLowerCase() ?? '';
-    if (r == 'admin') return Colors.blue;
-    if (r == 'pharmacist') return Colors.green;
-    if (r == 'cashier') return Colors.orange;
-    if (r == 'owner') return Colors.purple;
-    return Colors.grey;
-  }
-
-  String get initials {
-    if (name == null || name!.isEmpty) return '?';
-    List<String> parts = name!.split(' ');
-    if (parts.length > 1 && parts[1].isNotEmpty) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
   }
 }
