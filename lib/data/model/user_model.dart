@@ -8,6 +8,16 @@ UserModel userModelFromMap(String str) => UserModel.fromJson(json.decode(str));
 
 String userModelToMap(UserModel data) => json.encode(data.toJson());
 
+// --- HELPER FUNCTIONS ---
+
+Object? _readId(Map<dynamic, dynamic> json, String key) {
+  return json['user_id'] ?? json['id'];
+}
+
+Object? _readAddress(Map<dynamic, dynamic> json, String key) {
+  return json['alamat'] ?? json['address'];
+}
+
 @JsonSerializable()
 class UserModel {
   @JsonKey(name: "status")
@@ -29,10 +39,9 @@ class UserModel {
 
 @JsonSerializable()
 class Datum {
-  // === PERBAIKAN UTAMA ===
-  // Mapping 'user_id' dari Laravel ke variabel 'id' di Flutter
-  @JsonKey(name: "user_id")
+  @JsonKey(name: "user_id", readValue: _readId)
   final String? id;
+
   @JsonKey(name: "name")
   final String? name;
   @JsonKey(name: "emp_id")
@@ -46,23 +55,17 @@ class Datum {
   @JsonKey(name: "date_of_birth")
   final String? dateOfBirth;
 
-  // Mapping 'alamat' dari Laravel ke variabel 'address'
-  @JsonKey(name: "alamat")
+  @JsonKey(name: "alamat", readValue: _readAddress)
   final String? address;
 
   @JsonKey(name: "salary")
-  final dynamic salary; // Dynamic agar aman menerima String "Rp..." atau Int
-
+  final dynamic salary;
   @JsonKey(name: "start_date")
   final String? startDate;
-
   @JsonKey(name: "avatar")
   final dynamic avatar;
-
-  // Mapping ke created_at (snake_case) dan ubah ke String biar aman
   @JsonKey(name: "created_at")
   final String? createdAt;
-
   @JsonKey(name: "updated_at")
   final String? updatedAt;
 
@@ -90,7 +93,7 @@ class Datum {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-
+    map['user_id'] = id;
     map['name'] = name;
     map['emp_id'] = empId;
     map['email'] = email;

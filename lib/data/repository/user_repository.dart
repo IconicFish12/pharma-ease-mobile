@@ -13,6 +13,13 @@ class UserRepository implements Repository<Datum> {
 
   UserRepository(this.tokenService) : _dio = DioClient(tokenService).dio;
 
+  final Options _ngrokOptions = Options(
+    headers: {
+      "ngrok-skip-browser-warning": "true",
+      "Accept": "application/json",
+    },
+  );
+
   @override
   Future<Either<Failure, List<Datum>>> getMany({
     Map<String, dynamic>? queryParams,
@@ -21,11 +28,18 @@ class UserRepository implements Repository<Datum> {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParams,
+        options: _ngrokOptions,
       );
 
       if (response.statusCode == 200) {
-        final wrapper = UserModel.fromJson(response.data);
-        return Right(wrapper.data ?? []);
+        if (response.data is List) {
+          List<dynamic> rawList = response.data;
+          List<Datum> dataList = rawList.map((e) => Datum.fromJson(e)).toList();
+          return Right(dataList);
+        } else {
+          final wrapper = UserModel.fromJson(response.data);
+          return Right(wrapper.data ?? []);
+        }
       } else {
         return Left(Failure("Server Error: ${response.statusCode}"));
       }
@@ -39,7 +53,7 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, Datum>> getOne(dynamic id) async {
     try {
-      final response = await _dio.get('$endpoint/$id');
+      final response = await _dio.get('$endpoint/$id', options: _ngrokOptions);
 
       if (response.statusCode == 200) {
         final json = response.data['data'] ?? response.data;
@@ -60,7 +74,11 @@ class UserRepository implements Repository<Datum> {
     try {
       debugPrint("API Request Create Payload: $data");
 
-      final response = await _dio.post(endpoint, data: data);
+      final response = await _dio.post(
+        endpoint,
+        data: data,
+        options: _ngrokOptions,
+      );
 
       debugPrint(
         "API Response Create: ${response.statusCode} - ${response.data}",
@@ -88,13 +106,17 @@ class UserRepository implements Repository<Datum> {
   }
 
   @override
-  Future<Either<Failure, Datum>> update(dynamic id, {required dynamic data}) async {
+  Future<Either<Failure, Datum>> update(
+    dynamic id, {
+    required dynamic data,
+  }) async {
     try {
       debugPrint("API Request Update Payload: $data");
 
       final response = await _dio.put(
         '$endpoint/$id',
         data: data,
+        options: _ngrokOptions,
       );
 
       debugPrint("API Response Update: ${response.statusCode}");
@@ -102,7 +124,7 @@ class UserRepository implements Repository<Datum> {
       if (response.statusCode == 201 || response.statusCode == 200) {
         final json = response.data['data'] ?? response.data;
         final updatedUser = Datum.fromJson(json);
-        return Right(updatedUser); 
+        return Right(updatedUser);
       }
       return Left(Failure("Gagal update data: Status ${response.statusCode}"));
     } on DioException catch (e) {
@@ -122,19 +144,23 @@ class UserRepository implements Repository<Datum> {
   @override
   Future<Either<Failure, bool>> delete(dynamic id) async {
     try {
-      final response = await _dio.delete('$endpoint/$id');
+      final response = await _dio.delete(
+        '$endpoint/$id',
+        options: _ngrokOptions,
+      );
+
       debugPrint(
-        "delette Error: ${response.statusCode} | ${response.statusMessage}",
+        "Delete Response: ${response.statusCode} | ${response.statusMessage}",
       );
       if (response.statusCode == 200) {
         return const Right(true);
       }
       return Left(Failure("Gagal delete"));
     } on DioException catch (e) {
-      debugPrint("Update Error: ${e.message.toString()}");
+      debugPrint("Delete Error: ${e.message.toString()}");
       return Left(Failure(e.message ?? "Terjadi kesalahan koneksi"));
     } catch (e) {
-      debugPrint("Update Error: ${e.toString()}");
+      debugPrint("Delete Error: ${e.toString()}");
       return Left(Failure(e.toString()));
     }
   }
