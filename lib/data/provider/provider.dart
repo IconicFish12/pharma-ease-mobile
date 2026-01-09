@@ -88,19 +88,25 @@ class Provider<T> extends ChangeNotifier {
     _setLoading();
     final result = await repository.update(id, data: data);
 
-    return result.fold(
+    return await result.fold(
       (failure) {
         _setError(failure);
         return false;
       },
-      (updatedData) {
-        final index = _listData.indexWhere((element) => element == _selectedData); 
-        if (index != -1) {
-           _listData[index] = updatedData;
+      (updatedData) async {
+        if (updatedData is T) {
+          final index = _listData.indexWhere(
+            (element) => element == _selectedData,
+          );
+          if (index != -1) {
+            _listData[index] = updatedData;
+          }
+          _selectedData = updatedData;
+          _setSuccess();
+        } else {
+          await fetchList();
         }
         
-        _selectedData = updatedData;
-        _setSuccess();
         return true;
       },
     );
@@ -118,8 +124,6 @@ class Provider<T> extends ChangeNotifier {
       },
       (success) {
         fetchList(); 
-        
-        _setSuccess();
         return true;
       },
     );

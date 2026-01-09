@@ -17,7 +17,7 @@ abstract class Repository<T> {
 
   Future<Either<Failure, T>> create({required dynamic data});
 
-  Future<Either<Failure, T>> update(dynamic id, {required dynamic data});
+  Future<Either<Failure, dynamic>> update(dynamic id, {required dynamic data});
 
   Future<Either<Failure, bool>> delete(dynamic id);
 }

@@ -21,7 +21,7 @@ class TransactionDetailsRepository implements Repository {
   }
 
   @override
-  Future<Either<Failure, dynamic>> update(id, {required dynamic data}) {
+  Future<Either<Failure, String>> update(id, {required dynamic data}) {
     // TODO: implement update
     throw UnimplementedError();
   }

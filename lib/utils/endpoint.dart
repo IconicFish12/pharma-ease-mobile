@@ -1,5 +1,6 @@
 
-const String baseUrl = "https://jamari-transuranic-uncentrally.ngrok-free.dev/api/admin"; 
+const String baseUrl =
+    "https://unforgettable-anjanette-longshore.ngrok-free.dev/api/admin"; 
 
 enum Endpoints {
 
