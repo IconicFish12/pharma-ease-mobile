@@ -17,16 +17,10 @@ class MedicineDetail extends StatefulWidget {
 }
 
 class _MedicineDetailState extends State<MedicineDetail> {
-  // Kita gunakan local state untuk update UI langsung setelah edit tanpa fetch ulang entire list
-  late Datum _currentMedicine;
+  // HAPUS initState dan _currentMedicine lokal.
+  // Kita akan ambil data real-time di method build.
 
-  @override
-  void initState() {
-    super.initState();
-    _currentMedicine = widget.medicine;
-  }
-
-  void _showEditMedicineModal(BuildContext context) {
+  void _showEditMedicineModal(BuildContext context, Datum currentData) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -37,21 +31,21 @@ class _MedicineDetailState extends State<MedicineDetail> {
         ),
         child: AddEditMedicineModal(
           isEditMode: true,
-          medicineToEdit: _currentMedicine,
+          medicineToEdit: currentData, // Kirim data terbaru
         ),
       ),
-    ).then((_) {
-      context.read<MedicineProvider>().fetchList();
-    });
+    );
+    // Tidak perlu .then(fetchList) manual disini,
+    // karena Provider Anda sudah otomatis fetchList saat updateData return bool/false.
   }
 
-  void _confirmDelete(BuildContext context) {
+  void _confirmDelete(BuildContext context, Datum currentData) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Medicine'),
         content: Text(
-          'Are you sure you want to delete ${_currentMedicine.displayName}?',
+          'Are you sure you want to delete ${currentData.displayName}?',
         ),
         actions: [
           TextButton(
@@ -67,7 +61,7 @@ class _MedicineDetailState extends State<MedicineDetail> {
               Navigator.pop(dialogContext);
 
               final success = await context.read<MedicineProvider>().deleteData(
-                _currentMedicine.id,
+                currentData.id,
               );
 
               if (success && context.mounted) {
@@ -75,6 +69,7 @@ class _MedicineDetailState extends State<MedicineDetail> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Medicine deleted successfully'),
+                    backgroundColor: Colors.green,
                   ),
                 );
               } else if (context.mounted) {
@@ -83,7 +78,7 @@ class _MedicineDetailState extends State<MedicineDetail> {
                 );
               }
             },
-            child: const Text('Delete'),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -93,9 +88,22 @@ class _MedicineDetailState extends State<MedicineDetail> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
+    // LOGIKA REAKTIF:
+    // Ambil data terbaru dari Provider list.
+    // Jika update berhasil, Provider akan refresh list, dan widget ini akan rebuild otomatis.
+    final provider = context.watch<MedicineProvider>();
+
+    // Cari obat ini di dalam list terbaru provider.
+    // Gunakan orElse untuk fallback ke widget.medicine (data awal) jika list kosong/loading.
+    final medicine = provider.listData.firstWhere(
+      (element) => element.id == widget.medicine.id,
+      orElse: () => widget.medicine,
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_currentMedicine.displayName, style: textTheme.titleLarge),
+        title: Text(medicine.displayName, style: textTheme.titleLarge),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Config.textPrimary),
           onPressed: () => context.pop(),
@@ -103,12 +111,12 @@ class _MedicineDetailState extends State<MedicineDetail> {
         actions: [
           IconButton(
             icon: Icon(Icons.edit_outlined, color: Config.primaryGreen),
-            onPressed: () => _showEditMedicineModal(context),
+            onPressed: () => _showEditMedicineModal(context, medicine),
             tooltip: 'Edit',
           ),
           IconButton(
             icon: Icon(Icons.delete_outline, color: Config.errorRed),
-            onPressed: () => _confirmDelete(context),
+            onPressed: () => _confirmDelete(context, medicine),
             tooltip: 'Delete',
           ),
         ],
@@ -130,13 +138,10 @@ class _MedicineDetailState extends State<MedicineDetail> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _currentMedicine.displayName,
-                      style: textTheme.headlineMedium,
-                    ),
+                    Text(medicine.displayName, style: textTheme.headlineMedium),
                     const SizedBox(height: 8),
                     Text(
-                      "SKU: ${_currentMedicine.displayCode}",
+                      "SKU: ${medicine.displayCode}",
                       style: textTheme.bodyMedium,
                     ),
                     const Divider(height: 24),
@@ -144,27 +149,27 @@ class _MedicineDetailState extends State<MedicineDetail> {
                     _buildDetailRow(
                       context,
                       'Price',
-                      _currentMedicine.price ?? '0',
+                      medicine.price ?? '0',
                       Icons.attach_money,
                     ),
                     _buildDetailRow(
                       context,
                       'Stock',
-                      _currentMedicine.stock.toString(),
+                      medicine.stock.toString(),
                       Icons.storage_outlined,
                     ),
                     _buildDetailRow(
                       context,
                       'Expiry Date',
-                      _currentMedicine.expiredDate ?? '-',
+                      medicine.expiredDate ?? '-',
                       Icons.calendar_today_outlined,
                     ),
                     _buildDetailRow(
                       context,
                       'Status',
-                      _currentMedicine.statusText,
+                      medicine.statusText,
                       Icons.info_outline,
-                      statusColor: _currentMedicine.statusColor,
+                      statusColor: medicine.statusColor,
                     ),
                   ],
                 ),
@@ -172,7 +177,6 @@ class _MedicineDetailState extends State<MedicineDetail> {
             ),
             const SizedBox(height: 24),
 
-            // Deskripsi (Optional jika ada di model)
             Text('Description', style: textTheme.titleLarge),
             const SizedBox(height: 12),
             Card(
@@ -184,7 +188,7 @@ class _MedicineDetailState extends State<MedicineDetail> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  'Medicine ${_currentMedicine.displayName} (SKU: ${_currentMedicine.sku}). Ensure to check stock regularly.',
+                  'Medicine ${medicine.displayName} (SKU: ${medicine.sku}). Ensure to check stock regularly.',
                   style: textTheme.bodyMedium,
                 ),
               ),

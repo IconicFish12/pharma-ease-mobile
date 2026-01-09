@@ -209,7 +209,6 @@ class _AddEditMedicineModalState extends State<AddEditMedicineModal> {
                     builder: (context, provider, child) {
                       final List<cat.Datum> categories = provider.listData
                           .cast<cat.Datum>();
-
                       return DropdownButtonFormField<String>(
                         decoration: const InputDecoration(
                           labelText: 'Kategori Obat',

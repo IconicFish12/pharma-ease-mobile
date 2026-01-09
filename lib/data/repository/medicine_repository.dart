@@ -43,11 +43,10 @@ class MedicineRepository implements Repository<Datum> {
       final response = await _dio.get('$endpoint/$id');
 
       if (response.statusCode == 200) {
-        final wrapper = MedicineModel.fromJson(response.data);
-        if (wrapper.data != null && wrapper.data!.isNotEmpty) {
-          return Right(wrapper.data!.first);
-        }
-        return Left(Failure("Data tidak ditemukan"));
+        // Handle kemungkinan wrapper data
+        final json = response.data['data'] ?? response.data;
+        final data = Datum.fromJson(json);
+        return Right(data);
       }
       return Left(Failure("Server Error: ${response.statusCode}"));
     } on DioException catch (e) {
@@ -68,11 +67,9 @@ class MedicineRepository implements Repository<Datum> {
       debugPrint("API Response Create: ${response.statusCode} - ${response.data}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        
-
-        final wrapper = Datum.fromJson(response.data['data']);
-          return Right(wrapper);
-        
+        final json = response.data['data'] ?? response.data;
+        final wrapper = Datum.fromJson(json);
+        return Right(wrapper);
       }
       return Left(Failure("Gagal create data: Status ${response.statusCode}"));
     } on DioException catch (e) {
@@ -85,7 +82,7 @@ class MedicineRepository implements Repository<Datum> {
   }
 
   @override
-  Future<Either<Failure, Datum>> update(dynamic id, {required dynamic data}) async {
+  Future<Either<Failure, bool>> update(dynamic id, {required dynamic data}) async {
     try {
       debugPrint("API Request Update Payload: $data");
 
@@ -97,15 +94,15 @@ class MedicineRepository implements Repository<Datum> {
       debugPrint("API Response Update: ${response.statusCode}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        final wrapper = Datum.fromJson(response.data['data']);
-
-          return Right(wrapper);
+        // Karena backend hanya return true/message, kita return true saja
+        return const Right(true);
       }
       return Left(Failure("Gagal update data: Status ${response.statusCode}"));
     } on DioException catch (e) {
        debugPrint("DioError Update: ${e.response?.data} | ${e.message}");
       return Left(Failure(e.response?.data['message'] ?? e.message ?? "Terjadi kesalahan koneksi"));
     } catch (e) {
+      debugPrint("Error Message : ${e.toString()}");
       return Left(Failure(e.toString()));
     }
   }
