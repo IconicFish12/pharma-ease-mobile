@@ -37,6 +37,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
     if (mounted) {
       if (success) {
         Navigator.pop(context);
+        context.read<UserProvider>().fetchList();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('User added successfully'),
@@ -64,6 +66,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
     if (mounted) {
       if (success) {
         Navigator.pop(context);
+        context.read<UserProvider>().fetchList();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('User updated successfully'),
@@ -127,6 +131,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('User Management', style: textTheme.titleLarge),
@@ -154,7 +159,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
             Expanded(
               child: Consumer<UserProvider>(
                 builder: (context, provider, child) {
-                  if (provider.state == ViewState.loading) {
+                  if (provider.state == ViewState.loading &&
+                      provider.listData.isEmpty) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
@@ -372,14 +378,11 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
       }
 
       _address = u.address ?? '';
-
       _dateOfBirth = u.dateOfBirth;
       _startDate = u.startDate;
-
       _password = '';
     } else {
       _userId = '';
-
       _fullName = '';
       _email = '';
       _empId = '';
@@ -388,11 +391,8 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
       _salary = '';
       _address = '';
       _password = '';
-
       _startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     }
-
-    debugPrint("ID : $_userId");
 
     if (_dateOfBirth != null) {
       _dobController.text = _formatDateDisplay(_dateOfBirth!);
@@ -448,6 +448,7 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
   void _saveForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
       final user = Datum(
         id: widget.isEditMode ? widget.userToEdit!.id : null,
         name: _fullName,
@@ -483,28 +484,27 @@ class _AddEditUserModalState extends State<_AddEditUserModal> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(dialogContext);
+
               final success = await context.read<UserProvider>().deleteData(
                 widget.userToEdit?.id,
               );
 
-              if (context.mounted) {
-                if (success) {
-                  Navigator.pop(context);
+              if (success && context.mounted) {
+                Navigator.pop(context);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('User deleted successfully'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Failed to delete user'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('User deleted successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Failed to delete user'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
             },
             child: const Text('Delete', style: TextStyle(color: Colors.white)),
